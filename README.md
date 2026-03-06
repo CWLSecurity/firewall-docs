@@ -1,59 +1,81 @@
-# Firewall Vault
+# Firewall Vault Documentation
 
 **Protected version of your wallet**
 
-Firewall Vault is a non-custodial transaction firewall for EVM wallets.
+Firewall Vault is an on-chain transaction firewall for EVM wallets.
 
-Unlike traditional wallet security tools, it does not only simulate or warn.  
+It does not only simulate transactions or show warnings.  
 It enforces transaction rules **on-chain** before execution.
 
-## What makes Firewall Vault different
-Most wallet-security products focus on:
+## What Firewall Vault is
+Firewall Vault is a non-custodial wallet protection model built around smart-account style transaction enforcement.
+
+Instead of asking the user to interpret warnings, Firewall Vault applies rules that can:
+
+- allow safe actions
+- delay sensitive actions
+- revert dangerous actions
+
+## Why it matters
+Most wallet-security tools focus on:
 - simulation
-- risk warnings
+- warnings
 - off-chain analysis
 
 Firewall Vault takes a different approach:
-- safe actions can proceed
-- sensitive actions can be delayed
-- dangerous actions can be reverted
+- no backend trust for policy decisions
+- no off-chain risk engine
+- no AI-based scoring
+- direct on-chain enforcement
 
-## Core principles
-- Non-custodial
-- On-chain enforcement
-- No backend
-- No off-chain policy engine
-- No AI-based trust assumptions
-- Security logic enforced by smart contracts
+## Core message
+**On-chain enforcement, not warnings.**  
+**No custody, no backend.**
 
-## MVP status
-Current MVP status:
+## Current MVP status
 - Core contracts deployed on Base
 - UI MVP implemented
 - Read-only mode implemented
-- Delayed transaction queue implemented
-- GitHub repositories published
+- Delayed queue implemented
+- Repositories published on GitHub
 
 ## Repositories
-- `firewall-wallet` — smart contracts and core enforcement logic
-- `firewall-ui` — frontend for using Firewall Vault
-- `PROJECT_HOME` — launch, trust, and security documentation
+- [`../firewall-wallet`](../firewall-wallet) — smart contracts and enforcement layer
+- [`../firewall-ui`](../firewall-ui) — frontend for using Firewall Vault
+- `PROJECT_HOME` — documentation, launch materials, and trust materials
 
-## Key documentation
-- `SECURITY_MODEL.md`
-- `LAUNCH_CHECKLIST.md`
-- `INFO_CAMPAIGN_PLAN.md`
+## Where to start
+If you are new to the project, read in this order:
+
+1. [`README.md`](./README.md)
+2. [`ARCHITECTURE.md`](./ARCHITECTURE.md)
+3. [`SECURITY_MODEL.md`](./SECURITY_MODEL.md)
+4. [`LAUNCH_CHECKLIST.md`](./LAUNCH_CHECKLIST.md)
+
+## Documentation map
+- [`ARCHITECTURE.md`](./ARCHITECTURE.md) — high-level product and contract flow
+- [`SECURITY_MODEL.md`](./SECURITY_MODEL.md) — MVP security assumptions and limitations
+- [`LAUNCH_CHECKLIST.md`](./LAUNCH_CHECKLIST.md) — operational launch checklist
+- [`INFO_CAMPAIGN_PLAN.md`](./INFO_CAMPAIGN_PLAN.md) — launch messaging and outreach plan
 
 ## Who this is for
 - Security-focused DeFi users
 - Power users
 - Early adopters
-- Users who want transaction enforcement instead of only warnings
+- Users who want enforcement instead of only warnings
+
+## MVP limitations
+- MVP stage
+- Base-first deployment
+- No ERC20 UI
+- No policy editor UI
+- No backend analytics
+- Audit status must be checked separately
 
 ## Important note
-This is an MVP.  
-If the contracts are not audited, the product must be treated as unaudited software.
+If the contracts are not audited, Firewall Vault must be treated as unaudited software.
 
-## Core message
-**On-chain enforcement, not warnings.**  
-**No custody, no backend.**
+## Positioning
+Firewall Vault is not just another wallet warning layer.
+
+It aims to be a **wallet-level transaction firewall** for EVM users.
