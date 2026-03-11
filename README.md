@@ -50,11 +50,13 @@ If you are new to the project, read in this order:
 1. [`README.md`](./README.md)
 2. [`ARCHITECTURE.md`](./ARCHITECTURE.md)
 3. [`SECURITY_MODEL.md`](./SECURITY_MODEL.md)
-4. [`LAUNCH_CHECKLIST.md`](./LAUNCH_CHECKLIST.md)
+4. [`DEPLOYMENT.md`](./DEPLOYMENT.md)
+5. [`LAUNCH_CHECKLIST.md`](./LAUNCH_CHECKLIST.md)
 
 ## Documentation map
 - [`ARCHITECTURE.md`](./ARCHITECTURE.md) — high-level product and contract flow
 - [`SECURITY_MODEL.md`](./SECURITY_MODEL.md) — MVP security assumptions and limitations
+- [`DEPLOYMENT.md`](./DEPLOYMENT.md) — V2 deployment model for base/add-on packs
 - [`LAUNCH_CHECKLIST.md`](./LAUNCH_CHECKLIST.md) — operational launch checklist
 - [`INFO_CAMPAIGN_PLAN.md`](./INFO_CAMPAIGN_PLAN.md) — launch messaging and outreach plan
 
