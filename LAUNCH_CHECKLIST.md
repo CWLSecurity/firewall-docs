@@ -1,37 +1,54 @@
-# Firewall Vault — Launch Checklist (MVP)
+# Firewall Vault — Launch Checklist (Current)
 
-## 1) Production Deployment (UI)
-- Choose hosting (Cloudflare Pages / Vercel / Netlify)
-- Ensure pnpm build passes for firewall-ui
-- Deploy firewall-ui/dist
-- Custom domain + HTTPS (optional)
-- Confirm Base-only behavior on prod URL
+Last updated: 2026-03-24
 
-## 2) Trust Pack (Core + UI)
-- Non-custodial statement
-- On-chain enforcement (FirewallModule + PolicyRouter)
-- No backend
-- UI stores no keys; only localStorage for wallet addr/preset
-- Link to BaseScan addresses (Factory/Router/Policies/Module)
-- Link to source repos (UI + Core)
-- Disclaimer: Not audited (if true)
+## 1) Deployment and Verification
+- Confirm deployed addresses and explorer verification are published.
+- Confirm curated packs are registered and active:
+  - Base `0` / Base `1`
+  - Add-ons `2`, `3`, `4`
+- Confirm policy metadata introspection values (`policyKey`, `policyName`, `policyConfigVersion`, config entries) for all active pack policies.
 
-## 3) Observability (UI)
-- Add lightweight analytics (Plausible / Cloudflare Web Analytics)
-- Track funnel:
-  - connect
-  - create wallet success
-  - import wallet success
-  - send success
-  - execute/cancel success
+## 2) Security Semantics Validation
+- Router decision priority validated on live deployment (`REVERT > DELAY > ALLOW`).
+- `executeScheduled` current-policy recheck validated.
+- Strict approval behavior validated on conservative line.
+- DeFi line compensating controls validated (new spender/new recipient friction paths).
+- Large-transfer threshold boundaries validated (`below`, `equal`, `above`).
 
-## 4) Product Packaging
-- Landing page copy + FAQ
-- 2–3 short demo videos (create / send / queue)
-- Support channel (Telegram/Discord/email)
+## 3) UI Readiness
+- Create/import Vault flows are stable on Base.
+- Active protections and add-ons render readable business copy.
+- Tooltips are concise and link to full policy catalog.
+- Queue summary + queue modal execute/cancel flows are operational.
+- `Disconnect Vault` does not auto-reconnect in background unless user explicitly creates/imports.
 
-## 5) Operational Readiness
-- Verify no secrets in repo (.env, keys)
-- Test Chrome/Brave + mobile MetaMask
-- Known Issues list
-- Incident plan
+## 4) Reliability and Degradation
+- Transient RPC degradation handling verified (fallback copy + retry behavior).
+- No critical path depends on non-deterministic frontend-only policy logic.
+- Known limitations are explicitly documented in user-facing docs.
+
+## 5) Privacy and Storage
+- Site-side business-state persistence disabled for wallet connection state.
+- No analytics SDK or telemetry pipeline in app code.
+- Public-facing copy clarifies external wallet/RPC logging trust boundary.
+
+## 6) Product Messaging Consistency
+- Messaging consistently states:
+  - non-custodial signer model,
+  - on-chain deterministic policy enforcement,
+  - security-console role of UI.
+- Avoid overclaims (no "guaranteed safety" messaging).
+
+## 7) Ops and Release Hygiene
+- Smoke pass complete on latest build.
+- CI status green for:
+  - `PROJECT_HOME` docs/integrity workflow
+  - `firewall-ui` quality + smoke + integrity workflow
+  - `firewall-wallet` contracts + smoke + integrity workflow
+- Integrity manifests checked:
+  - `PROJECT_HOME/integrity/manifest.sha256`
+  - `firewall-ui/integrity/manifest.sha256`
+  - `firewall-wallet/integrity/manifest.sha256`
+- Incident/reporting path documented.
+- Rollback owner/escalation contacts defined.

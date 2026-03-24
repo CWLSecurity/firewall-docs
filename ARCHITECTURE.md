@@ -1,113 +1,77 @@
-# Firewall Vault — Architecture
+# Firewall Vault — Architecture (Current)
 
-## High-level idea
-Firewall Vault is a non-custodial transaction firewall for EVM wallets.
+Last updated: 2026-03-23
 
-It protects users by enforcing transaction rules on-chain before execution.
+## 1. System Overview
 
-## High-level flow
-
-    User
+    Signer Wallet (MetaMask/Rabby)
+      ↓ owner-signed calls
+    Firewall UI (security console)
       ↓
-    FirewallModule
-      ↓
+    FirewallModule (Vault executor)
+      ↓ evaluate
     PolicyRouter
       ↓
-    PolicyPackRegistry + Entitlement Hook
+    Base Pack + Enabled Add-on Policies
       ↓
-    Policies
-      ↓
-    ALLOW / DELAY / REVERT
+    REVERT / DELAY / ALLOW
 
-## What each layer does
+## 2. Core Principles
+- Deterministic on-chain enforcement.
+- Non-custodial key ownership (signer wallet keeps keys).
+- Pack-based composition (one base pack + additive add-ons).
+- Router outcome priority is fixed (`REVERT > DELAY > ALLOW`).
+- No off-chain policy engine.
 
-### User
-The user initiates an action from the UI through a connected wallet.
-
-### FirewallModule
-The FirewallModule is the smart-account style execution layer.
-It receives the intended transaction and forwards it into the policy system.
-
-### PolicyRouter
-The PolicyRouter evaluates the transaction against:
-- fixed base pack policies (selected at wallet creation),
-- enabled add-on policy snapshots stored in the wallet router.
-
-Final decision priority:
-- `REVERT` > `DELAY` > `ALLOW`
-
-### Policies
-Policies determine whether the transaction should:
-- proceed immediately
-- be delayed
-- be reverted
-
-## Core contracts
+## 3. Core Contract Set
 - `FirewallModule`
 - `PolicyRouter`
 - `FirewallFactory`
 - `PolicyPackRegistry`
-- `IEntitlementManager` hook (minimal implementation: `SimpleEntitlementManager`)
+- `SimpleEntitlementManager`
+- `ProtocolRegistry`
+- `TrustedVaultRegistry`
 
-## Main policies
-- `InfiniteApprovalPolicy`
-- `LargeTransferDelayPolicy`
-- `NewReceiverDelayPolicy`
-- `UnknownContractBlockPolicy`
+## 4. Decision Model
+Router folding:
+- any policy returns `Revert` -> final `Revert`
+- else any policy returns `Delay` -> final `Delay` (max delay)
+- else -> `Allow`
 
-## Pack model (V2)
-### Base packs (fixed)
-- selected during `createWallet(owner, recovery, basePackId)`
-- immutable per wallet after creation
-- mandatory security layer
+This model is deterministic and policy-order independent for strictness outcome.
 
-### Add-on packs (curated)
-- optional extra policy packs
-- enabled by wallet owner only if entitlement permits
-- can only add checks on top of base security
-- policy addresses are snapshotted into each wallet router at enable time
-- registry deactivation blocks new enablements only (does not remove already-enabled protection)
+## 5. Pack Model
+Base packs (fixed at create time):
+- Base `0`: Conservative (`Vault Safe` in UI)
+- Base `1`: DeFi Trader
 
-### Effective policy set
-`Base Pack + Enabled Add-on Snapshots`
+Add-on packs (enabled later, additive):
+- Add-on `2`: Approval Hardening
+- Add-on `3`: New Receiver 24h Delay
+- Add-on `4`: Large Transfer 24h Delay
 
-Current base IDs:
-- `0` — Conservative
-- `1` — DeFi Trader
+Current semantics:
+- Enabled add-ons are snapshotted in router state.
+- Add-ons are additive only.
+- Current router line has no disable path for enabled add-ons.
 
-## Execution outcomes
+## 6. Product Surface Split
+- `firewall-wallet`: canonical contract semantics.
+- `firewall-ui`: active user-facing security console.
+- `firewall-connector`: EIP-1193 connector boundary (MVP maturity; integration boundary, not universal wallet replacement).
 
-### Allow
-The transaction is executed immediately.
+## 7. Security-Relevant Runtime Notes
+- Scheduled execution is re-checked against current policy state.
+- Large-transfer policy uses explicit ETH/ERC20 thresholds with `>=` trigger semantics.
+- Policy metadata introspection (`policyKey`, `policyName`, `policyDescription`, `policyConfigVersion`, `policyConfig`) is required for admissible policies.
 
-### Delay
-The transaction is placed into the on-chain delayed queue and can be executed later when unlocked.
+## 8. Known Product Constraints (Current)
+- Base chain scope: Base Mainnet.
+- Add-on permanence semantics in current router model.
+- Large-transfer selector scope is intentionally narrow (`ETH value`, ERC20 `transfer` / `transferFrom`).
 
-### Revert
-The transaction is blocked and does not execute.
-
-## Delayed queue
-Firewall Vault supports:
-- `schedule`
-- `executeScheduled`
-- `cancelScheduled`
-
-The delay logic is enforced on-chain.
-
-## MVP scope
-Current MVP focuses on:
-- Base Mainnet
-- core policy enforcement
-- fixed base pack security
-- add-on entitlement hook foundation
-- create/import wallet flow
-- ETH send flow
-- delayed queue management
-- read-only dashboard mode
-
-## What is intentionally out of scope in MVP
-- ERC20 UI
-- calldata decoding UI
-- policy editor UI
-- backend analytics
-- mobile app
+## 9. Canonical Detail Sources
+- `../firewall-wallet/PACK_MATRIX.md`
+- `../firewall-wallet/SECURITY_MODEL.md`
+- `../firewall-wallet/VERIFY_DEPLOYMENT.md`
+- `../firewall-ui/UI_ARCHITECTURE.md`

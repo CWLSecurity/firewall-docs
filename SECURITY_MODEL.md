@@ -1,96 +1,92 @@
-# Firewall Vault — Security Model (MVP)
+# Firewall Vault — Security Model (Current v1 / v1.5)
 
-## Purpose
-Firewall Vault is a non-custodial transaction firewall for EVM wallets.
+## 1. Security objective
+Reduce wallet-drain impact by enforcing deterministic on-chain controls before execution.
 
-Its purpose is not to warn about risk after the fact, but to enforce transaction rules on-chain before execution.
+## 2. Enforcement model
+Every action is evaluated through `PolicyRouter`.
+Final outcome is deterministic:
+- `REVERT` > `DELAY` > `ALLOW`
 
-## Core guarantees
-Firewall Vault is designed around the following guarantees:
+No off-chain risk engine is required for enforcement.
 
-- Non-custodial
-- On-chain enforcement
-- Policy decision flow: allow / delay / revert
-- Decision priority: revert > delay > allow
-- Delay queue enforced on-chain
-- No backend policy engine
-- No off-chain trust required for transaction enforcement
+## 3. Pack security model
+- Each wallet has one fixed base pack.
+- Optional add-on packs can be enabled later if entitled.
+- Add-ons are additive only.
+- Enabled add-ons persist once enabled in current router behavior.
 
-## Base security invariants (V2)
-- Each wallet is created with a fixed base pack.
-- Base pack cannot be removed after wallet creation.
-- Base protections remain mandatory and always active for that wallet.
-- Premium/add-on packs cannot replace or weaken base protections.
-- Add-ons may only add extra checks.
-- Entitlement is checked when enabling add-ons (not per-transaction).
-- Enabled add-on policies are snapshotted in wallet router storage.
-- Registry deactivation does not disable already-enabled add-on protection.
+Current curated packs:
+- Base `0`: Conservative
+- Base `1`: DeFi Trader
+- Add-on `2`: Approval Hardening
+- Add-on `3`: New Receiver 24h Delay
+- Add-on `4`: Large Transfer 24h Delay
 
-Current mandatory base protections:
-- `InfiniteApprovalPolicy`
-- `LargeTransferDelayPolicy`
-- `NewReceiverDelayPolicy`
+## 4. Implemented hardening (phases)
+### Phase 1
+- Scheduled execution hardening:
+  - `executeScheduled` re-evaluates current policy state.
+  - If current decision is `Revert`, execution is blocked.
+- Strict approval hardening:
+  - `approve(0)` allowed,
+  - `approve(non-zero)` blocked,
+  - `increaseAllowance(0)` allowed,
+  - `increaseAllowance(non-zero)` blocked,
+  - `setApprovalForAll(true)` blocked,
+  - permit-like selectors blocked in strict packs unless explicitly allowed.
 
-## UI behavior
-The UI is designed with the following properties:
+### Phase 2
+DeFi compensating controls:
+- `ApprovalToNewSpenderDelayPolicy`
+  - non-zero approval to EOA spender => `Revert`
+  - first non-zero approval to new contract spender => `Delay`
+- `Erc20FirstNewRecipientDelayPolicy`
+  - first ERC20 `transfer`/`transferFrom` recipient => `Delay`
 
-- UI never stores private keys
-- Transaction signing happens through MetaMask or another injected wallet
-- UI is stateless except for localStorage persistence of wallet-related convenience data
-- Read-only mode does not grant transaction authority
+Post-exec state updates are protected by trusted caller checks in `onExecuted` paths.
 
-## What Firewall Vault is intended to protect against
-Firewall Vault is intended to reduce the risk of transaction patterns such as:
+### Phase 3A
+`LargeTransferDelayPolicy` hardening:
+- delay on `>=` threshold,
+- separate ETH/ERC20 threshold configuration,
+- scope kept explicit and narrow.
 
-- infinite token approvals
-- transfers to new or unknown recipients
-- calls to unknown contracts
-- large transfers that should not execute instantly
+### Phase 3B
+- `FirewallFactory.createWallet(owner, ...)` requires `msg.sender == owner`.
+- `NewEOAReceiverDelayPolicy` delays first unknown-selector call to a new contract target.
+- `NewEOAReceiverDelayPolicy` and `NewReceiverDelayPolicy` parse NFT transfer selectors for recipient extraction.
+- `FirewallModule` supports inbound safe NFT transfers via `ERC721` / `ERC1155` receiver hooks.
 
-In V2, additional curated add-on packs can strengthen this posture when entitled.
+## 5. Current guarantees
+- Deterministic policy folding per action.
+- Queue actions remain policy-governed.
+- Strict approval protections remain available in strict packs.
+- DeFi pack remains usable while adding targeted approval/outflow friction.
+- DeFi line now adds one-time delay friction for unknown-selector calls to new contract targets.
+- Large transfer delays remain active in all curated packs.
+- Add-ons can increase strictness but cannot weaken base policies.
 
-## What Firewall Vault does not guarantee
-Firewall Vault does not guarantee protection against every possible loss scenario.
+## 6. Known limitations and tradeoffs
+- Add-on disable path is not present in current router.
+- Registry deactivation/entitlement revocation does not remove already-enabled add-ons.
+- ERC20 thresholds are raw-unit based, not economically normalized.
+- Large-transfer policy does not cover arbitrary calldata economic semantics.
+- Delay adds review window but is not absolute prevention if owner later executes malicious intent.
+- Endpoint and device security (wallet extension, browser, machine compromise) remain out of protocol control.
 
-In MVP form, it does not guarantee protection against:
+## 7. Trust boundaries
+Users still trust:
+- signer wallet integrity,
+- frontend delivery integrity,
+- RPC correctness for reads,
+- deployed contract correctness,
+- governance/operations around registry/entitlements.
 
-- compromise of the user's EOA or browser wallet
-- malware on the user's device
-- phishing that tricks the user into approving an unsafe wallet setup outside the intended flow
-- RPC manipulation affecting reads or UI perception
-- vulnerabilities in third-party wallets, browser extensions, or user environment
-- unknown smart contract bugs if unaudited
+## 8. Product security posture
+Firewall Vault is a protected execution layer, not a full standalone wallet replacement.
 
-## Assumptions
-The MVP assumes:
-
-- the user controls the EOA used with the system
-- the user's signing wallet is not already compromised
-- the connected RPC is trustworthy enough for read operations
-- deployed contracts correspond to the intended verified source code
-- the user verifies they are interacting with the real Firewall Vault deployment
-- policy packs in `PolicyPackRegistry` are curated and reviewed before activation
-- entitlement manager logic correctly reports `isEntitled(owner, packId)` for paid/add-on access
-
-## Trust boundaries
-Firewall Vault minimizes trust in off-chain systems for enforcement, but trust still exists in:
-
-- the user's local environment
-- the browser wallet
-- the frontend delivery path
-- the RPC provider for reads
-- the correctness of deployed smart contracts
-- registry and entitlement governance/operations for curated pack lifecycle
-
-## Key limitations
-- MVP stage
-- contracts may be unaudited
-- UI supply chain risk exists
-- browser wallet compromise defeats UI-layer trust
-- queue lookback limitations may affect discovery in the UI
-- delays may temporarily block urgent user actions
-
-## Summary
-Firewall Vault reduces risk by moving transaction enforcement into smart contracts.
-
-It improves security posture by replacing part of the traditional warning-based model with on-chain decision enforcement, but it is not a complete substitute for wallet hygiene, device security, and careful user verification.
+Current UX model:
+- Firewall UI as security console,
+- signer wallet for keys/signatures,
+- future Vault Connector as compatibility bridge.

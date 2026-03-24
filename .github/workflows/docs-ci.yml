@@ -1,0 +1,28 @@
+name: PROJECT_HOME Docs CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  docs-integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify required docs exist
+        run: |
+          set -euo pipefail
+          test -f README.md
+          test -f ARCHITECTURE.md
+          test -f SECURITY_MODEL.md
+          test -f Risk.md
+          test -f next_step.md
+
+      - name: Check documentation integrity manifest
+        run: |
+          chmod +x ./scripts/integrity.sh
+          ./scripts/integrity.sh check

@@ -1,83 +1,79 @@
-# Firewall Vault — Verify Your Firewall
+# Verify Your Firewall (Current v1 / v1.5)
 
-## Purpose
-This document helps users verify that the protection they see is real and corresponds to the intended Firewall Vault deployment.
+Last updated: 2026-03-24
 
-## What to verify
-Users should verify:
+This guide explains how to verify that your deployed/used Firewall Vault setup matches the intended architecture.
 
-- the correct contract addresses
-- verified source code
-- expected ownership and wallet relationships
-- that execution goes through FirewallModule
-- that they are using the intended frontend and repositories
+## 1. Verify core contract wiring
+Confirm addresses for:
+- `FirewallFactory`
+- `PolicyPackRegistry`
+- `SimpleEntitlementManager` (or compatible entitlement hook)
+- your wallet `FirewallModule`
+- your wallet `PolicyRouter`
 
-## 1. Verify contract addresses
-Check the published addresses for:
-- FirewallFactory
-- PolicyRouter
-- active policy contracts
-- your FirewallModule instance
+Verify router is bound to your wallet and base pack id.
+Factory auth expectation:
+- `createWallet(owner, ...)` requires caller is the same `owner`.
 
-Compare them with:
-- the official repository documentation
-- the UI display
-- block explorer pages
+## 2. Verify pack registrations
+In `PolicyPackRegistry`, confirm curated lineup:
+- Base `0` Conservative
+- Base `1` DeFi Trader
+- Add-on `2` Approval Hardening
+- Add-on `3` New Receiver 24h Delay
+- Add-on `4` Large Transfer 24h Delay
 
-## 2. Verify source code on explorer
-On BaseScan, verify that:
-- contracts are verified
-- source code is readable
-- contract names match expectations
-- deployed code corresponds to the intended modules
+For each pack verify:
+- active status,
+- pack type (`BASE` / `ADDON`),
+- policy list.
 
-## 3. Verify there is no unexpected proxy behavior
-Users should confirm whether the deployment matches the intended architecture and does not rely on unexpected proxy indirection.
+## 3. Verify active policy composition per wallet
+For your wallet router verify:
+- base policy snapshot (`policies(i)`),
+- enabled add-on packs and their snapshotted policies.
 
-Practical check:
-- inspect contract pages on the explorer
-- inspect verified source
-- inspect constructor/setup patterns
-- compare with public architecture docs
+Remember:
+- add-on snapshots stay active once enabled,
+- later registry deactivation/entitlement changes do not remove already-enabled snapshots.
 
-## 4. Verify wallet ownership
-Users should verify that the Firewall wallet they created or imported is actually their intended wallet and is configured for their ownership expectations.
+## 4. Verify policy identity and config
+For each active policy address read:
+- `policyKey()`
+- `policyName()`
 
-Practical checks may include:
-- reading owner-related state if exposed
-- confirming wallet address shown in the UI
-- confirming the creating transaction on explorer
-- confirming the wallet belongs to the intended user flow
+Then read policy-specific config getters.
 
-## 5. Verify execution path
-A user should confirm that transactions are not bypassing the FirewallModule.
+Large transfer policy must expose:
+- `ETH_THRESHOLD_WEI`
+- `ERC20_THRESHOLD_UNITS`
+- `DELAY_SECONDS`
 
-Practical signs:
-- transactions originate through the intended wallet execution flow
-- queue-related activity is visible on-chain when delay is triggered
-- transaction history corresponds to FirewallModule-based execution
+## 5. Verify critical behavior assumptions
+- Router decision order is `REVERT > DELAY > ALLOW`.
+- Scheduled execution path (`executeScheduled`) is still policy-rechecked and blocked if current decision is `Revert`.
+- Strict packs keep non-zero approval hard blocks.
+- DeFi pack includes compensating controls for first risky spender/recipient patterns.
+- DeFi line delays first unknown-selector call to a new contract target.
 
-## 6. Verify frontend sources
-Users should verify:
-- the public GitHub repositories
-- the documented product structure
-- the public README and security docs
-- that the UI they use corresponds to the intended published project
+## 6. Verify NFT receive compatibility
+For wallet module address verify:
+- `supportsInterface(0x01ffc9a7) == true` (`IERC165`)
+- `supportsInterface(0x150b7a02) == true` (`IERC721Receiver`)
+- `supportsInterface(0x4e2312e0) == true` (`IERC1155Receiver`)
 
-## 7. Understand current limitations
-Before trusting the system, users should confirm:
-- MVP stage
-- audit status
-- Base-only scope
-- no ERC20 UI in MVP
-- queue lookback limitations in UI
+## 7. Verify frontend integrity
+Confirm you are using intended repositories and deployment:
+- `firewall-wallet`
+- `firewall-ui`
+- `PROJECT_HOME`
 
-## Summary checklist
-Before using Firewall Vault with meaningful funds:
+## 8. Know current limits before trusting meaningful funds
+- MVP / audit status applies unless explicitly updated.
+- ERC20 large-transfer thresholding is raw-unit based.
+- Large-transfer policy scope is limited to ETH value + ERC20 `transfer`/`transferFrom`.
+- UI remains the primary security console in current product stage.
 
-- verify contract addresses
-- verify explorer source code
-- verify the intended wallet and ownership path
-- verify transaction flow goes through FirewallModule
-- verify audit status and MVP limitations
-- verify you are using the intended frontend
+For contract-level commands and exact read paths, use:
+- `firewall-wallet/VERIFY_DEPLOYMENT.md`

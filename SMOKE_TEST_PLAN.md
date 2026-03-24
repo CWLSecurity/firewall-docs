@@ -1,262 +1,163 @@
-# Firewall Vault — Smoke Test Plan (MVP)
+# Firewall Vault — Smoke Test Plan (Active Modular UI)
+
+Last updated: 2026-03-24
 
 ## 1. Purpose
+Validate launch-critical user flows in the active modular dashboard (`src/App.tsx` + `src/modules/*`) before production rollout.
 
-This smoke test validates that Firewall Vault MVP works end-to-end for the main user flows before production deployment.
-
-Goal:
-
-- confirm core product usability
-- catch blocking bugs
-- catch critical UX issues
-- verify that main on-chain flows behave correctly
-
-This is **not** a full QA cycle and **not** a security audit.
-
----
+This is a launch smoke test, not a full QA cycle and not a security audit.
 
 ## 2. Scope
-
-This smoke test covers:
-
-- wallet connection
-- network validation
-- firewall wallet creation
-- firewall wallet import
-- ETH send flow
-- delay flow
-- execute scheduled transaction
-- cancel scheduled transaction
-- read-only mode
-- diagnostics
+In scope:
+- connect / network gate
+- wallet discovery
+- create wallet flow
+- dashboard module visibility
+- transactions + delayed queue
+- packs visibility
+- diagnostics behavior
 
 Out of scope:
-
-- deep edge-case testing
+- deep cross-browser matrix
 - performance benchmarking
-- formal security validation
-- cross-browser full regression matrix
-- advanced DeFi interaction testing
-
----
+- formal contract security validation
 
 ## 3. Test Environment
-
-Network: Base Mainnet  
-chainId: 8453
-
-Frontend:
-- firewall-ui
-
-Wallet:
-- MetaMask or compatible EVM wallet
-
-Browser:
-- Chrome latest
-
-Required:
-- EOA with Base ETH for gas
-- optional second address for transfers
-
----
+- Network: Base Mainnet (`8453`)
+- Frontend: `firewall-ui`
+- Wallet: MetaMask or compatible injected wallet
+- Browser: latest Chrome
+- Test funds: small Base ETH for gas and transfer tests
 
 ## 4. Exit Criteria
+PASS:
+- no blocker or critical issues in active flows
+- correct state-driven module visibility
+- no stale or contradictory status messaging
 
-Smoke test PASSED if:
+FAIL:
+- create wallet flow broken
+- queue management broken
+- wrong network gate broken
+- dashboard state transitions broken
 
-- core flows work
-- no blocker bugs
-- no critical UX issues
+## 5. Severity
+- Blocker: product unusable
+- Critical: core security/control flow incorrect
+- Major: significant UX friction
+- Minor: cosmetic/documentation mismatch
 
-FAILED if:
+## 6. Test Cases
 
-- wallet cannot connect
-- firewall wallet cannot be created/imported
-- send ETH broken
-- delayed tx cannot execute/cancel
-- wrong network not handled
-- diagnostics misleading
-
----
-
-## 5. Severity Levels
-
-Blocker — product unusable  
-Critical — core flow incorrect or dangerous  
-Major — strong UX friction  
-Minor — cosmetic issue
-
----
-
-## 6. Tests
-
-### T1 App Load
-
-Open app and confirm UI renders.
-
+### T1 App load
 Expected:
-- no blank screen
-- actions visible
+- page renders
+- connect area visible when disconnected
+- diagnostics collapsed
 
-Severity if fail: Blocker
+Severity on fail: Blocker
 
----
-
-### T2 Connect Wallet
-
-Connect wallet and verify address appears.
-
+### T2 Connect wallet
 Expected:
-- wallet connected
 - address shown
-- UI updates
+- chain status shown
+- wrong-network warning shown if non-Base
 
 Severity: Blocker
 
----
-
-### T3 Wrong Network
-
-Switch wallet to non-Base network.
-
+### T3 Connected, no Firewall Wallet found
 Expected:
-- app warns about wrong network
-- actions disabled
+- Wallet Summary visible
+- Create Firewall Wallet visible
+- messaging explains discovery/retry/manual path
 
 Severity: Critical
 
----
-
-### T4 Create Firewall Wallet
-
-Create firewall wallet from UI.
+### T4 Create wallet (happy path)
+Action:
+- select Security Mode/Base Pack
+- submit create transaction
 
 Expected:
-- tx submitted
-- wallet created
-- UI shows wallet address
+- pending state clear
+- duplicate-click prevented while pending
+- success state shows created Firewall Wallet
+- dashboard refreshes into wallet-created state
 
 Severity: Blocker
 
----
-
-### T5 Import Firewall Wallet
-
-Import existing firewall wallet.
+### T5 Create wallet (reject/failure)
+Action:
+- reject signature or force RPC failure
 
 Expected:
-- wallet loads
-- state visible
+- clear failure message
+- UI remains usable for retry
+- no frozen pending state
+
+Severity: Critical
+
+### T6 Wallet-created dashboard state
+Expected visible modules:
+- Wallet Summary
+- Security
+- Transactions
+- Queue
+- Security Packs
+- Diagnostics collapsed
 
 Severity: Blocker
 
----
-
-### T6 Read-Only Mode
-
-Inspect wallet without executing actions.
-
+### T7 Queue empty state
 Expected:
-- data visible
-- no broken UI
+- queue area visible
+- clear empty-state copy
+- no error spam
 
 Severity: Major
 
----
-
-### T7 Send ETH (Allow Flow)
-
-Send small ETH amount.
+### T8 Queue populated state
+Action:
+- schedule delayed tx
 
 Expected:
-- tx executes immediately
-- success shown
-- balance refresh
-
-Severity: Blocker
-
----
-
-### T8 Send ETH (Delay Flow)
-
-Send amount triggering delay.
-
-Expected:
-- tx appears in delayed queue
-- not executed immediately
+- tx appears in queue
+- execute/cancel action buttons behave correctly
+- pending/confirming protection against duplicate action submits
 
 Severity: Critical
 
----
-
-### T9 Delayed Queue
-
-Open delayed queue.
-
+### T9 Packs area visibility
 Expected:
-- queued tx visible
-- details understandable
-
-Severity: Critical
-
----
-
-### T10 Execute Scheduled
-
-Execute delayed tx.
-
-Expected:
-- tx executes
-- queue updates
-
-Severity: Blocker
-
----
-
-### T11 Cancel Scheduled
-
-Cancel delayed tx.
-
-Expected:
-- tx cancelled
-- queue updates
-
-Severity: Blocker
-
----
-
-### T12 Diagnostics
-
-Open diagnostics page.
-
-Expected:
-- network and config visible
-- no false status
-
-Severity: Critical
-
----
-
-### T13 Error Handling
-
-Reject wallet signature.
-
-Expected:
-- UI recovers
-- no frozen state
+- base packs shown
+- optional add-on pack section shown
+- entitlement state labels shown (available/locked/unknown)
 
 Severity: Major
 
----
+### T10 Diagnostics behavior
+Expected:
+- diagnostics collapsed by default
+- technical details available only on expand
 
-## 7. Time Budget
+Severity: Major
 
-Total time: 30–40 minutes
+## 7. Known limitations to validate and communicate
+- Wallet discovery is log-based and bounded by factory lookback window.
+- Queue discovery is log-based and bounded by queue lookback window.
+- Add-on pack discovery is candidate-ID based pending richer on-chain enumeration.
 
----
+## 8. Time Budget
+~30–45 minutes for one complete pass.
 
-## 8. Result
+## 9. Result Format
+- PASS
+- PASS WITH ISSUES (major/minor only)
+- FAIL (any blocker/critical)
 
-PASS — no blocker or critical issues  
-PASS WITH ISSUES — only major/minor issues  
-FAIL — blocker or critical issues found
+## 10. Automated Smoke Entry Points
+- UI smoke suite:
+  - `cd ../firewall-ui && npm run test:smoke`
+  - `cd ../firewall-ui && npm run smoke`
+- Contracts smoke suite:
+  - `cd ../firewall-wallet && npm run smoke:contracts`

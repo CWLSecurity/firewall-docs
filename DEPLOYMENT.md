@@ -1,34 +1,103 @@
-# Firewall Vault — Deployment (V2)
+# Firewall Vault — Deployment (Current)
 
-## Core deployment model
-Firewall Vault V2 core deploys:
+Last updated: 2026-03-24
+
+## What this file covers
+This document is the cross-repo deployment map.
+It explains what must be deployed in each repository:
+- `firewall-wallet` (on-chain contracts)
+- `firewall-ui` (web app)
+- `firewall-connector` (EIP-1193 package)
+
+## Deployment Scope by Repository
+
+### 1) `firewall-wallet` (on-chain)
+Deploy and wire:
 - policy contracts,
 - `PolicyPackRegistry` with curated base/add-on packs,
-- entitlement manager (`isEntitled(owner, packId)` hook),
-- `FirewallFactory` bound to registry + entitlement.
+- entitlement manager,
+- `FirewallFactory` bound to registry + entitlement manager.
 
-## Base packs
-- Base pack `0`: Conservative
-- Base pack `1`: DeFi Trader
+Wallet creation entrypoint:
+- `createWallet(owner, recovery, basePackId)`
+- creation is owner-authenticated (`msg.sender == owner`)
 
-Both remain fixed per wallet after creation and preserve existing base policy behavior/parameters.
+Current curated packs:
+- Base `0`: Conservative (`Vault Safe` in UI)
+- Base `1`: DeFi Trader
+- Add-on `2`: Approval Hardening
+- Add-on `3`: New Receiver 24h Delay
+- Add-on `4`: Large Transfer 24h Delay
 
-## Wallet creation
-`createWallet(owner, recovery, basePackId)` creates:
-- `FirewallModule`
-- per-wallet `PolicyRouter` bound to selected base pack.
+Current add-on semantics:
+- enabled later through router, subject to entitlement mode,
+- additive only,
+- snapshotted to wallet router state,
+- no disable path in current router line.
 
-## Add-on packs
-Add-ons are curated packs in registry and can be enabled only if entitlement allows.
-They only add checks to base security.
-When enabled, add-on policy addresses are snapshotted into the wallet router.
-If registry later deactivates a pack, only future enablements are blocked.
-Already-enabled wallets keep their add-on protections active.
+Policy metadata required for admitted policies:
+- `policyKey`
+- `policyName`
+- `policyDescription`
+- `policyConfigVersion`
+- `policyConfig`
 
-## Effective policy set
-`Base Pack + Enabled Add-on Snapshots`  
-Decision priority remains `REVERT > DELAY > ALLOW`.
+Large-transfer config shape:
+- `ETH_THRESHOLD_WEI`
+- `ERC20_THRESHOLD_UNITS` (raw token units)
+- `DELAY_SECONDS`
 
-## Contract-level deployment details
-See:
-- [`../firewall-wallet/DEPLOYMENT.md`](../firewall-wallet/DEPLOYMENT.md)
+Selector scope remains intentionally narrow:
+- native ETH value
+- ERC20 `transfer`
+- ERC20 `transferFrom`
+
+### 2) `firewall-ui` (frontend)
+Static app deployment.
+
+Recommended hosting:
+- Cloudflare Pages
+- Vercel
+- Netlify
+
+Build:
+```bash
+cd firewall-ui
+pnpm install
+pnpm build
+```
+Artifact:
+- `firewall-ui/dist`
+
+Operational notes:
+- Base-only network requirement (current product stage).
+- SPA routing should be configured correctly in hosting.
+- Cache headers should allow safe roll-forward/rollback.
+
+### 3) `firewall-connector` (integration package)
+Library/package deployment model, not a standalone wallet UI.
+
+Deployment means:
+- publish package version,
+- publish docs/integration examples,
+- integrate in partner apps/wallet-adjacent flows.
+
+Current maturity:
+- Base-first connector boundary.
+- Planned post-MVP stage (not on critical MVP release path).
+
+## Network scope (current)
+- Production target: Base Mainnet.
+- Multi-network expansion requires per-network contract deployment + per-app config updates.
+
+## Canonical operational references
+Contract deployment and verification details:
+- `../firewall-wallet/DEPLOYMENT.md`
+- `../firewall-wallet/VERIFY_DEPLOYMENT.md`
+- `../firewall-wallet/DEPLOYMENT_STATUS.md`
+
+UI delivery details:
+- `../firewall-ui/README.md`
+
+Connector details:
+- `../firewall-connector/README.md`
