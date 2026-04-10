@@ -1,6 +1,6 @@
 # Firewall Vault Documentation Hub
 
-Last updated: 2026-03-24
+Last updated: 2026-03-25
 
 This folder is the cross-repo documentation hub for Firewall Vault.
 
@@ -24,7 +24,31 @@ Core runtime model:
   - Add-on `3`: 24-Hour New Receiver Delay
   - Add-on `4`: 24-Hour Large Transfer Delay
 - Delayed queue lifecycle in UI (review / execute / cancel).
+- Per-Vault queue bot automation with owner-controlled executor role.
+- Vault creation supports initial bot gas buffer funding.
 - Policy introspection-driven display with business-language mapping.
+
+## MVP Scope (In / Out)
+In MVP now:
+- `firewall-wallet`: Base deployment line with curated packs and queue semantics.
+- `firewall-ui`: primary user path (connect, create/import vault, send/receive, queue actions).
+- `PROJECT_HOME`: canonical product/security/deployment documentation.
+
+Out of MVP (next stage):
+- `firewall-connector` browser-extension rollout.
+- partner dApp wrapper integrations through connector.
+- multi-chain expansion beyond Base Mainnet.
+
+## MVP Usage Path (Current)
+1. User connects signer wallet in `firewall-ui`.
+2. User creates/imports Vault.
+3. User sends/receives through Vault from `Actions`.
+4. Delayed actions are managed in `Queue`.
+5. Optional: enable Vault queue bot in Queue modal for auto-execution after unlock.
+6. Keep bot gas buffer funded for expected delayed-transaction volume.
+
+Post-MVP:
+- `firewall-connector` (extension/partner dApp embedding) is rollout phase after MVP sign-off.
 
 ## Repository Map
 - `../firewall-wallet`
@@ -42,6 +66,7 @@ Core runtime model:
 - `VERIFY_YOUR_FIREWALL.md`
 - `LAUNCH_CHECKLIST.md`
 - `SMOKE_TEST_PLAN.md`
+- `BOT_AUTOMATION.md`
 - `Risk.md`
 - `next_step.md`
 - `MARKETING_BRIEF.md`

@@ -1,6 +1,6 @@
 # Firewall Vault — Security Policy
 
-Last updated: 2026-03-23
+Last updated: 2026-03-25
 
 ## Reporting a vulnerability
 If you believe you found a security vulnerability in Firewall Vault, report it responsibly.
@@ -44,6 +44,7 @@ Current interpretation for users:
 - assume contracts are not audited unless explicitly announced otherwise,
 - verify addresses and source code before meaningful use,
 - test with low-value flows first.
+- if queue bot is enabled, verify relayer executor and bot server status in UI.
 
 ## Security philosophy
 Firewall Vault reduces risk with deterministic on-chain enforcement before execution.
