@@ -1,6 +1,9 @@
 # Product docs and launch runbooks
 README.md
 ARCHITECTURE.md
+TCB_MAP.md
+SECURITY_CALL_GRAPH.md
+CODE_REVIEW_GUIDE.md
 SECURITY_MODEL.md
 SECURITY.md
 Risk.md

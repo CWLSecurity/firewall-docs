@@ -86,6 +86,9 @@ Current semantics:
 - Large-transfer selector scope is intentionally narrow (`ETH value`, ERC20 `transfer` / `transferFrom`).
 
 ## 9. Canonical Detail Sources
+- `TCB_MAP.md`
+- `SECURITY_CALL_GRAPH.md`
+- `CODE_REVIEW_GUIDE.md`
 - `../firewall-wallet/PACK_MATRIX.md`
 - `../firewall-wallet/SECURITY_MODEL.md`
 - `../firewall-wallet/VERIFY_DEPLOYMENT.md`
