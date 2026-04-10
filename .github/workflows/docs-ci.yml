@@ -18,6 +18,9 @@ jobs:
           set -euo pipefail
           test -f README.md
           test -f ARCHITECTURE.md
+          test -f TCB_MAP.md
+          test -f SECURITY_CALL_GRAPH.md
+          test -f CODE_REVIEW_GUIDE.md
           test -f SECURITY_MODEL.md
           test -f Risk.md
           test -f next_step.md

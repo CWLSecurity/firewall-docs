@@ -60,6 +60,9 @@ Post-MVP:
 
 ## Core Docs In This Folder
 - `ARCHITECTURE.md`
+- `TCB_MAP.md`
+- `SECURITY_CALL_GRAPH.md`
+- `CODE_REVIEW_GUIDE.md`
 - `DEPLOYMENT.md`
 - `SECURITY.md`
 - `SECURITY_MODEL.md`
@@ -75,6 +78,7 @@ Post-MVP:
 - `PROJECT_HOME`: docs integrity check via `./scripts/integrity.sh check`
 - `firewall-ui`: `npm run smoke` + `npm run integrity:check`
 - `firewall-wallet`: `npm run test:contracts`, `npm run smoke:contracts`, `npm run integrity:check`
+- decision trace utility: `./scripts/trace-policy-decision.sh`
 
 ## Messaging Guardrails (Short)
 Safe claims:
