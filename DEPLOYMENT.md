@@ -1,6 +1,6 @@
 # Firewall Vault — Deployment (Current)
 
-Last updated: 2026-03-24
+Last updated: 2026-03-25
 
 ## What this file covers
 This document is the cross-repo deployment map.
@@ -11,16 +11,22 @@ It explains what must be deployed in each repository:
 
 ## Deployment Scope by Repository
 
+Current release sequencing:
+- MVP production rollout uses `firewall-wallet` + `firewall-ui`.
+- `firewall-connector` deployment is explicitly post-MVP.
+
 ### 1) `firewall-wallet` (on-chain)
 Deploy and wire:
 - policy contracts,
 - `PolicyPackRegistry` with curated base/add-on packs,
 - entitlement manager,
-- `FirewallFactory` bound to registry + entitlement manager.
+- `PolicyRouterDeployer`,
+- `FirewallFactory` bound to registry + entitlement manager + router deployer.
 
 Wallet creation entrypoint:
 - `createWallet(owner, recovery, basePackId)`
 - creation is owner-authenticated (`msg.sender == owner`)
+- entrypoint is payable and can seed initial Vault bot gas buffer
 
 Current curated packs:
 - Base `0`: Conservative (`Vault Safe` in UI)
@@ -73,6 +79,15 @@ Operational notes:
 - Base-only network requirement (current product stage).
 - SPA routing should be configured correctly in hosting.
 - Cache headers should allow safe roll-forward/rollback.
+
+Queue bot server:
+- run `npm run bot:server` from `firewall-ui`.
+- requires:
+  - `BASE_RPC_URL`
+  - `RELAYER_PRIVATE_KEY` (or `DEPLOYER_PK` fallback)
+- queue bot API endpoints are served from `/api/v1/bot/*`.
+- UI Queue modal uses these endpoints to enable/disable per-Vault automation.
+- queued tx without reserve are skipped by relayer script.
 
 ### 3) `firewall-connector` (integration package)
 Library/package deployment model, not a standalone wallet UI.

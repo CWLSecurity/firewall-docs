@@ -1,6 +1,6 @@
-# Verify Your Firewall (Current v1 / v1.5)
+# Verify Your Firewall (Current v2)
 
-Last updated: 2026-03-24
+Last updated: 2026-03-25
 
 This guide explains how to verify that your deployed/used Firewall Vault setup matches the intended architecture.
 
@@ -15,6 +15,10 @@ Confirm addresses for:
 Verify router is bound to your wallet and base pack id.
 Factory auth expectation:
 - `createWallet(owner, ...)` requires caller is the same `owner`.
+- Newly created vault should expose `feeConfigAdmin() == owner`.
+- if vault was created with initial bot funding, `botGasBuffer()` should reflect that funded amount.
+- Owner discovery expectation:
+  - `latestWalletOfOwner(owner)` should return the newest factory vault for that owner.
 
 ## 2. Verify pack registrations
 In `PolicyPackRegistry`, confirm curated lineup:
@@ -55,13 +59,26 @@ Large transfer policy must expose:
 - Scheduled execution path (`executeScheduled`) is still policy-rechecked and blocked if current decision is `Revert`.
 - Strict packs keep non-zero approval hard blocks.
 - DeFi pack includes compensating controls for first risky spender/recipient patterns.
-- DeFi line delays first unknown-selector call to a new contract target.
+- DeFi line delays first unknown-selector call:
+  - to first-time EOAs,
+  - and per first-time `(contract target, selector)` for contracts.
 
 ## 6. Verify NFT receive compatibility
 For wallet module address verify:
 - `supportsInterface(0x01ffc9a7) == true` (`IERC165`)
 - `supportsInterface(0x150b7a02) == true` (`IERC721Receiver`)
 - `supportsInterface(0x4e2312e0) == true` (`IERC1155Receiver`)
+
+## 6A. Verify queue bot path (if enabled)
+- Verify relayer authorization:
+  - `isQueueExecutor(relayer) == true` for your Vault.
+- Verify reserve prerequisites for automation:
+  - queued tx intended for bot execution should have non-zero `scheduledReserve(txId)`.
+- Verify UI/server status in Queue modal:
+  - `Server bot: Enabled`
+  - `Executor on-chain: Enabled`
+- Verify revocation:
+  - after disable action, `isQueueExecutor(relayer) == false`.
 
 ## 7. Verify frontend integrity
 Confirm you are using intended repositories and deployment:

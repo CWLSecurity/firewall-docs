@@ -1,6 +1,6 @@
 # Firewall Vault — Smoke Test Plan (Active Modular UI)
 
-Last updated: 2026-03-24
+Last updated: 2026-03-25
 
 ## 1. Purpose
 Validate launch-critical user flows in the active modular dashboard (`src/App.tsx` + `src/modules/*`) before production rollout.
@@ -14,6 +14,7 @@ In scope:
 - create wallet flow
 - dashboard module visibility
 - transactions + delayed queue
+- queue bot enable/disable flow
 - packs visibility
 - diagnostics behavior
 
@@ -135,7 +136,21 @@ Expected:
 
 Severity: Major
 
-### T10 Diagnostics behavior
+### T10 Queue bot enable/disable
+Action:
+- open Queue modal -> Automation Bot panel
+- enable bot for selected Vault
+- disable bot for selected Vault
+
+Expected:
+- on enable: wallet signs `setQueueExecutor(..., true)` and server status becomes enabled
+- on disable: wallet signs `setQueueExecutor(..., false)` and server status becomes disabled
+- queued tx without reserve are not expected to auto-execute by bot
+- informative errors shown if bot server is unavailable
+
+Severity: Critical
+
+### T11 Diagnostics behavior
 Expected:
 - diagnostics collapsed by default
 - technical details available only on expand

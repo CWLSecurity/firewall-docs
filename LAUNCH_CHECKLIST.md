@@ -1,8 +1,11 @@
 # Firewall Vault — Launch Checklist (Current)
 
-Last updated: 2026-03-24
+Last updated: 2026-03-25
 
 ## 1) Deployment and Verification
+- MVP scope freeze confirmed:
+  - in-scope: `firewall-wallet` + `firewall-ui`,
+  - out-of-scope until next phase: `firewall-connector` rollout.
 - Confirm deployed addresses and explorer verification are published.
 - Confirm curated packs are registered and active:
   - Base `0` / Base `1`
@@ -21,6 +24,9 @@ Last updated: 2026-03-24
 - Active protections and add-ons render readable business copy.
 - Tooltips are concise and link to full policy catalog.
 - Queue summary + queue modal execute/cancel flows are operational.
+- Queue bot panel works:
+  - enable path updates on-chain executor role,
+  - disable path revokes role and disables server Vault run.
 - `Disconnect Vault` does not auto-reconnect in background unless user explicitly creates/imports.
 
 ## 4) Reliability and Degradation

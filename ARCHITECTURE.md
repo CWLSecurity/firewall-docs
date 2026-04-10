@@ -1,6 +1,6 @@
 # Firewall Vault — Architecture (Current)
 
-Last updated: 2026-03-23
+Last updated: 2026-03-25
 
 ## 1. System Overview
 
@@ -16,9 +16,21 @@ Last updated: 2026-03-23
       ↓
     REVERT / DELAY / ALLOW
 
+Queue automation path:
+
+    Signer Wallet (owner)
+      ↓ setQueueExecutor(relayer, true/false)
+    FirewallModule queue executor role
+      ↓
+    Queue Bot Server (relayer key only)
+      ↓ executeScheduledByExecutor(txId)
+    Unlocked queued actions
+
 ## 2. Core Principles
 - Deterministic on-chain enforcement.
 - Non-custodial key ownership (signer wallet keeps keys).
+- Owner key isolation in bot runtime (bot uses relayer key only).
+- Vault creation can pre-fund bot gas pool through payable factory create flow.
 - Pack-based composition (one base pack + additive add-ons).
 - Router outcome priority is fixed (`REVERT > DELAY > ALLOW`).
 - No off-chain policy engine.
@@ -26,6 +38,7 @@ Last updated: 2026-03-23
 ## 3. Core Contract Set
 - `FirewallModule`
 - `PolicyRouter`
+- `PolicyRouterDeployer`
 - `FirewallFactory`
 - `PolicyPackRegistry`
 - `SimpleEntitlementManager`
@@ -62,6 +75,8 @@ Current semantics:
 
 ## 7. Security-Relevant Runtime Notes
 - Scheduled execution is re-checked against current policy state.
+- Queue bot execution is gated by owner-controlled `setQueueExecutor`.
+- Relayer automation is reserve-aware (queued tx without reserve are skipped by bot script).
 - Large-transfer policy uses explicit ETH/ERC20 thresholds with `>=` trigger semantics.
 - Policy metadata introspection (`policyKey`, `policyName`, `policyDescription`, `policyConfigVersion`, `policyConfig`) is required for admissible policies.
 

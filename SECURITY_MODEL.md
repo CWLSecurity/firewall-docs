@@ -1,4 +1,4 @@
-# Firewall Vault — Security Model (Current v1 / v1.5)
+# Firewall Vault — Security Model (Current v2)
 
 ## 1. Security objective
 Reduce wallet-drain impact by enforcing deterministic on-chain controls before execution.
@@ -54,26 +54,48 @@ Post-exec state updates are protected by trusted caller checks in `onExecuted` p
 
 ### Phase 3B
 - `FirewallFactory.createWallet(owner, ...)` requires `msg.sender == owner`.
-- `NewEOAReceiverDelayPolicy` delays first unknown-selector call to a new contract target.
+- New vaults default `feeConfigAdmin` to wallet owner.
+- `FirewallFactory` exposes deterministic owner->vault discovery (`latestWalletOfOwner`).
+- `NewEOAReceiverDelayPolicy` delays first unknown-selector call to a new EOA target.
+- `NewEOAReceiverDelayPolicy` delays first unknown-selector call per `(contract target, selector)`.
 - `NewEOAReceiverDelayPolicy` and `NewReceiverDelayPolicy` parse NFT transfer selectors for recipient extraction.
 - `FirewallModule` supports inbound safe NFT transfers via `ERC721` / `ERC1155` receiver hooks.
+
+### Phase 4 (queue automation)
+- Owner can authorize/revoke bot relayer on-chain:
+  - `setQueueExecutor(relayer, true|false)`.
+- Bot executes only via:
+  - `executeScheduledByExecutor(txId)`.
+- Bot runtime uses relayer key only (owner key is not required or stored).
+- Early execution is still blocked by unlock checks and policy re-validation.
+- Queue reserve model:
+  - `schedule(...)` auto-reserves from Vault bot gas pool,
+  - pool can be seeded at Vault creation (payable `createWallet`) and topped up later,
+  - relayer refund is capped by on-chain gas caps.
 
 ## 5. Current guarantees
 - Deterministic policy folding per action.
 - Queue actions remain policy-governed.
 - Strict approval protections remain available in strict packs.
 - DeFi pack remains usable while adding targeted approval/outflow friction.
-- DeFi line now adds one-time delay friction for unknown-selector calls to new contract targets.
+- DeFi line now adds one-time delay friction for unknown-selector first calls:
+  - to EOAs,
+  - and per `(contract target, selector)` for contracts.
 - Large transfer delays remain active in all curated packs.
 - Add-ons can increase strictness but cannot weaken base policies.
+- Queue bot cannot bypass unlock windows.
+- Queue bot authorization is owner-controlled per Vault.
 
 ## 6. Known limitations and tradeoffs
 - Add-on disable path is not present in current router.
 - Registry deactivation/entitlement revocation does not remove already-enabled add-ons.
-- ERC20 thresholds are raw-unit based, not economically normalized.
+- ERC20 thresholds are normalized to 1e18 units via token `decimals()` (still not economically price-normalized).
+- Tokens with non-standard/missing `decimals()` metadata fall back to 18-decimal interpretation.
 - Large-transfer policy does not cover arbitrary calldata economic semantics.
 - Delay adds review window but is not absolute prevention if owner later executes malicious intent.
 - Endpoint and device security (wallet extension, browser, machine compromise) remain out of protocol control.
+- Queue bot is an external service and must stay online to execute automatically.
+- If bot is offline, owner can still execute manually from queue UI.
 
 ## 7. Trust boundaries
 Users still trust:
@@ -89,4 +111,5 @@ Firewall Vault is a protected execution layer, not a full standalone wallet repl
 Current UX model:
 - Firewall UI as security console,
 - signer wallet for keys/signatures,
-- future Vault Connector as compatibility bridge.
+- post-MVP Vault Connector as compatibility bridge.
+- connector hardened defaults avoid exposing upstream provider in page globals.
