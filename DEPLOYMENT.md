@@ -1,6 +1,6 @@
 # Firewall Vault — Deployment (Current)
 
-Last updated: 2026-03-25
+Last updated: 2026-04-21
 
 ## What this file covers
 This document is the cross-repo deployment map.
@@ -74,6 +74,21 @@ pnpm build
 ```
 Artifact:
 - `firewall-ui/dist`
+
+Current production rollout path:
+- canonical path: push to `firewall-ui/main` (GitHub Actions CI/CD),
+- CI workflow: `.github/workflows/ci.yml` (`lint`, `test`, `smoke`, `integrity:check`),
+- deploy workflow: `.github/workflows/deploy-cloudflare-pages.yml` (Cloudflare Pages publish),
+- required repo config:
+  - `CLOUDFLARE_API_TOKEN` (GitHub Secret),
+  - `CLOUDFLARE_ACCOUNT_ID` (GitHub Secret),
+  - `CF_PAGES_PROJECT_NAME` (GitHub Variable),
+- custom domains:
+  - `firewall-wallet.com`
+  - `www.firewall-wallet.com`
+
+Manual deploy remains fallback:
+- `../PROJECT_HOME/scripts/deploy-ui-cloudflare.sh`
 
 Operational notes:
 - Base-only network requirement (current product stage).
