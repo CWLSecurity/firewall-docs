@@ -58,4 +58,3 @@ It does not remove all risk. Users must still secure:
 ## Canonical references
 - `SECURITY_MODEL.md`
 - `VERIFY_YOUR_FIREWALL.md`
-- `Risk.md`
