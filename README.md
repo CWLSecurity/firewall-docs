@@ -76,7 +76,7 @@ Post-MVP:
 
 ## CI / Smoke / Integrity
 - `PROJECT_HOME`: docs integrity check via `./scripts/integrity.sh check`
-- `firewall-ui`: `npm run lint`, `npm run security:static`, `npm test`, `npm run smoke`, `npm run integrity:check`
+- `firewall-ui`: `npm run lint`, `npm run security:static`, `npm test`, `npm run test:bot:e2e`, `npm run smoke`, `npm run integrity:check`
 - `firewall-wallet`: `npm run security:static`, `npm run test:contracts`, `npm run smoke:contracts`, `npm run integrity:check`
 
 ## Messaging Guardrails (Short)
