@@ -67,6 +67,9 @@ Post-MVP:
 - `LAUNCH_CHECKLIST.md`
 - `SMOKE_TEST_PLAN.md`
 - `BOT_AUTOMATION.md`
+- `OPERATIONS_RUNBOOK.md`
+- `TERMS_OF_USE.md`
+- `PRIVACY_NOTICE.md`
 - `MARKETING_BRIEF.md`
 
 ## CI / Smoke / Integrity
