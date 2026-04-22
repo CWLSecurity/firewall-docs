@@ -10,7 +10,7 @@ RUN_ID="$(date -u +'%Y%m%dT%H%M%SZ')"
 RUN_DIR="${RUN_ROOT}/${RUN_ID}"
 mkdir -p "${RUN_DIR}"
 
-INCLUDE_CONNECTOR="${INCLUDE_CONNECTOR:-1}"
+INCLUDE_CONNECTOR="${INCLUDE_CONNECTOR:-0}"
 
 declare -A JOB_PID
 declare -A JOB_LOG

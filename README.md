@@ -1,6 +1,6 @@
 # Firewall Vault Documentation Hub
 
-Last updated: 2026-04-21
+Last updated: 2026-04-22
 
 This folder is the cross-repo documentation hub for Firewall Vault.
 
@@ -71,8 +71,8 @@ Post-MVP:
 
 ## CI / Smoke / Integrity
 - `PROJECT_HOME`: docs integrity check via `./scripts/integrity.sh check`
-- `firewall-ui`: `npm run smoke` + `npm run integrity:check`
-- `firewall-wallet`: `npm run test:contracts`, `npm run smoke:contracts`, `npm run integrity:check`
+- `firewall-ui`: `npm run lint`, `npm run security:static`, `npm test`, `npm run smoke`, `npm run integrity:check`
+- `firewall-wallet`: `npm run security:static`, `npm run test:contracts`, `npm run smoke:contracts`, `npm run integrity:check`
 
 ## Messaging Guardrails (Short)
 Safe claims:
