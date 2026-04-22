@@ -2,6 +2,8 @@
 
 Last updated: 2026-04-22
 
+Execution status and open blockers are tracked in `LAUNCH_STATUS.md`.
+
 ## 1) Deployment and Verification
 - MVP scope freeze confirmed:
   - in-scope: `firewall-wallet` + `firewall-ui`,
