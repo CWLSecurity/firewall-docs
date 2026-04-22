@@ -1,133 +1,100 @@
-# Firewall Vault — Deployment (Current)
+# Firewall Vault — Deployment (Current MVP Automation)
 
-Last updated: 2026-04-21
+Last updated: 2026-04-22
 
-## What this file covers
-This document is the cross-repo deployment map.
-It explains what must be deployed in each repository:
-- `firewall-wallet` (on-chain contracts)
-- `firewall-ui` (web app)
-- `firewall-connector` (EIP-1193 package)
+## Purpose
+Canonical cross-repo deployment process for MVP.
 
-## Deployment Scope by Repository
-
-Current release sequencing:
+## MVP Scope
+- In scope: `firewall-wallet`, `firewall-ui`, bot runtime, `PROJECT_HOME` docs.
+- Out of scope for MVP: `firewall-connector` deploy/release track.
 - MVP production rollout uses `firewall-wallet` + `firewall-ui`.
-- `firewall-connector` deployment is explicitly post-MVP.
+- `firewall-connector` remains a post-MVP rollout track.
 
-### 1) `firewall-wallet` (on-chain)
-Deploy and wire:
-- policy contracts,
-- `PolicyPackRegistry` with curated base/add-on packs,
-- entitlement manager,
-- `PolicyRouterDeployer`,
-- `FirewallFactory` bound to registry + entitlement manager + router deployer.
+## 1) Wallet (`firewall-wallet`)
+Target chain: Base Mainnet.
 
-Wallet creation entrypoint:
-- `createWallet(owner, recovery, basePackId)`
-- creation is owner-authenticated (`msg.sender == owner`)
-- entrypoint is payable and can seed initial Vault bot gas buffer
+Automatic release path from local operator machine:
+1. Quality/security gates run first:
+   - `npm run integrity:check`
+   - `npm run security:static`
+   - `npm run test:contracts`
+   - `npm run smoke:contracts`
+2. On-chain deploy runs from this machine:
+   - `npm run deploy:base`
+   - script path: `../firewall-wallet/scripts/deploy-base-mainnet.sh`
+3. Post-deploy sync is automatic:
+   - reads `packages/contracts/deployments/base-mainnet-manifest.json`
+   - updates `../firewall-ui/src/contracts/addresses/base.ts`
+   - refreshes `../firewall-ui/integrity/manifest.sha256`
+4. Then commit/push changed repos (`firewall-wallet`, `firewall-ui`) using their own release flow.
 
-Current curated packs:
-- Base `0`: Conservative (`Vault Safe` in UI)
-- Base `1`: DeFi Trader
-- Add-on `2`: Approval Hardening
-- Add-on `3`: New Receiver 24h Delay
-- Add-on `4`: Large Transfer 24h Delay
+Address-sync script:
+- `../firewall-wallet/scripts/sync-ui-addresses-from-manifest.sh`
 
-Current add-on semantics:
-- enabled later through router, subject to entitlement mode,
-- additive only,
-- snapshotted to wallet router state,
-- no disable path in current router line.
+## 2) UI (`firewall-ui`)
+Primary production path: GitHub push -> GitHub Actions -> Cloudflare Pages.
 
-Policy metadata required for admitted policies:
-- `policyKey`
-- `policyName`
-- `policyDescription`
-- `policyConfigVersion`
-- `policyConfig`
+Quality/security gates:
+- `npm run lint`
+- `npm run security:static`
+- `npm test`
+- `npm run smoke`
+- `npm run integrity:check`
 
-Large-transfer config shape:
-- `ETH_THRESHOLD_WEI`
-- `ERC20_THRESHOLD_UNITS` (raw token units)
-- `DELAY_SECONDS`
+GitHub workflows:
+- `.github/workflows/ci.yml` (`lint`, `security:static`, `test`, `smoke`, `integrity:check`)
+- `.github/workflows/deploy-cloudflare-pages.yml` (build + Cloudflare Pages deploy on `main`)
 
-Selector scope remains intentionally narrow:
-- native ETH value
-- ERC20 `transfer`
-- ERC20 `transferFrom`
+Required GitHub config:
+- secret `CLOUDFLARE_API_TOKEN`
+- secret `CLOUDFLARE_ACCOUNT_ID`
+- variable `CF_PAGES_PROJECT_NAME`
 
-### 2) `firewall-ui` (frontend)
-Static app deployment.
+Domains:
+- `firewall-wallet.com`
+- `www.firewall-wallet.com`
 
-Recommended hosting:
-- Cloudflare Pages
-- Vercel
-- Netlify
+## 3) Bot Runtime (remote server)
+Bot code is deployed from local machine (not from GitHub bot workflow).
 
-Build:
-```bash
-cd firewall-ui
-pnpm install
-pnpm build
-```
-Artifact:
-- `firewall-ui/dist`
+Deploy command:
+- `cd ../firewall-ui && npm run bot:deploy:remote`
 
-Current production rollout path:
-- canonical path: push to `firewall-ui/main` (GitHub Actions CI/CD),
-- CI workflow: `.github/workflows/ci.yml` (`lint`, `test`, `smoke`, `integrity:check`),
-- deploy workflow: `.github/workflows/deploy-cloudflare-pages.yml` (Cloudflare Pages publish),
-- required repo config:
-  - `CLOUDFLARE_API_TOKEN` (GitHub Secret),
-  - `CLOUDFLARE_ACCOUNT_ID` (GitHub Secret),
-  - `CF_PAGES_PROJECT_NAME` (GitHub Variable),
-- custom domains:
-  - `firewall-wallet.com`
-  - `www.firewall-wallet.com`
+Before remote deploy (automatic in script by default):
+- `npm run lint`
+- `npm run security:static`
+- `npm test`
+- `npm run smoke`
+- `npm run integrity:check`
 
-Manual deploy remains fallback:
-- `../PROJECT_HOME/scripts/deploy-ui-cloudflare.sh`
+Remote deploy script:
+- `../firewall-ui/scripts/deploy-bot-remote.sh`
 
-Operational notes:
-- Base-only network requirement (current product stage).
-- SPA routing should be configured correctly in hosting.
-- Cache headers should allow safe roll-forward/rollback.
+Health endpoint:
+- `https://bot.firewall-wallet.com/api/v1/bot/health`
 
-Queue bot server:
-- run `npm run bot:server` from `firewall-ui`.
-- requires:
-  - `BASE_RPC_URL`
-  - `RELAYER_PRIVATE_KEY` (or `DEPLOYER_PK` fallback)
-- queue bot API endpoints are served from `/api/v1/bot/*`.
-- UI Queue modal uses these endpoints to enable/disable per-Vault automation.
-- queued tx without reserve are skipped by relayer script.
+## 4) Extension (`firewall-connector`)
+- Ignored for MVP rollout.
+- Separate post-MVP track.
 
-### 3) `firewall-connector` (integration package)
-Library/package deployment model, not a standalone wallet UI.
+## 5) PROJECT_HOME (docs repo)
+Purpose: cross-repo docs and operator runbooks.
 
-Deployment means:
-- publish package version,
-- publish docs/integration examples,
-- integrate in partner apps/wallet-adjacent flows.
+Checks before push:
+- required docs presence
+- docs integrity manifest check (`./scripts/integrity.sh check`)
+- content-audit guardrails (via ops scripts)
 
-Current maturity:
-- Base-first connector boundary.
-- Planned post-MVP stage (not on critical MVP release path).
+Then push docs updates to GitHub.
 
-## Network scope (current)
-- Production target: Base Mainnet.
-- Multi-network expansion requires per-network contract deployment + per-app config updates.
+## Secrets policy
+- Tokens/keys stay in local machine environment or GitHub Secrets only.
+- `.env*`, private keys, token values must not be committed to git.
+- Repo `.gitignore` rules enforce local secret file exclusion.
 
-## Canonical operational references
-Contract deployment and verification details:
-- `../firewall-wallet/DEPLOYMENT.md`
-- `../firewall-wallet/VERIFY_DEPLOYMENT.md`
-- `../firewall-wallet/DEPLOYMENT_STATUS.md`
-
-UI delivery details:
-- `../firewall-ui/README.md`
-
-Connector details:
-- `../firewall-connector/README.md`
+## GitHub CI/CD inventory (expected, MVP)
+- `firewall-wallet`: `Firewall Wallet CI`
+- `firewall-ui`: `Firewall UI CI`, `Firewall UI Deploy (Cloudflare Pages)`
+- `firewall-docs` (`PROJECT_HOME`): `PROJECT_HOME Docs CI`
+- `firewall-connector`: no active workflow in MVP

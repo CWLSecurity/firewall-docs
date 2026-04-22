@@ -1,6 +1,6 @@
 # Firewall Vault — Launch Checklist (Current)
 
-Last updated: 2026-03-25
+Last updated: 2026-04-22
 
 ## 1) Deployment and Verification
 - MVP scope freeze confirmed:
@@ -50,8 +50,8 @@ Last updated: 2026-03-25
 - Smoke pass complete on latest build.
 - CI status green for:
   - `PROJECT_HOME` docs/integrity workflow
-  - `firewall-ui` quality + smoke + integrity workflow
-  - `firewall-wallet` contracts + smoke + integrity workflow
+  - `firewall-ui` quality + security-static + smoke + integrity workflow
+  - `firewall-wallet` contracts + security-static + smoke + integrity workflow
 - Integrity manifests checked:
   - `PROJECT_HOME/integrity/manifest.sha256`
   - `firewall-ui/integrity/manifest.sha256`

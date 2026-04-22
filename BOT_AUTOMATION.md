@@ -1,6 +1,6 @@
 # Firewall Vault — Queue Bot Automation
 
-Last updated: 2026-03-25
+Last updated: 2026-04-22
 
 ## Purpose
 Cross-repo reference for delayed queue auto-execution.
@@ -57,3 +57,10 @@ Cross-repo reference for delayed queue auto-execution.
 - Run bot server in trusted environment.
 - Mutating API endpoints should be local-only or protected with `BOT_API_TOKEN`.
 - Keep relayer key only in secrets manager/env, never in repo files.
+
+## Deploy path (MVP)
+- Push bot-related code via `firewall-ui` repo flow.
+- Deploy bot from local machine:
+  - `cd ../firewall-ui && npm run bot:deploy:remote`
+- Pre-deploy local checks are enforced by script default:
+  - `lint`, `security:static`, `test`, `smoke`, `integrity:check`.
