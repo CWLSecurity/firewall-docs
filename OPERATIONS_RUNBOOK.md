@@ -24,6 +24,9 @@ Last updated: 2026-04-22
 - Use `BOT_API_TOKEN` for remote bot API mutations.
 - Keep `BOT_ALLOW_UNSAFE_REMOTE` disabled.
 - If binding bot server to non-loopback host, startup requires `BOT_API_TOKEN`.
+- For Queue modal mutation calls in UI, set browser token:
+  - `sessionStorage.setItem('firewall.botApiToken', '<token>')`
+  - fallback key: `localStorage.setItem('FIREWALL_BOT_API_TOKEN', '<token>')`
 - Deploy script must fail if health reports `mutationAuthMode=unsafe-remote`.
 
 ## 4) Bot readiness checks per Vault

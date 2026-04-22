@@ -7,6 +7,10 @@ Last updated: 2026-04-22
 - Bot runtime: deployed on VPS and reachable via `bot.firewall-wallet.com`.
 - Deployment model: documented and aligned across repos (`wallet` local deploy, `ui` GitHub->Pages, `bot` local->VPS).
 - Handoff docs for dev team: added in all repos.
+- Bot auth hardening update shipped:
+  - UI supports token header for bot mutation endpoints via browser storage keys,
+  - bot auth model has dedicated e2e tests in `firewall-ui` CI (`test:bot:e2e`).
+- Wallet smoke coverage expanded with launch e2e flow scenarios (`V2EndToEndLaunchFlows.t.sol`).
 
 ## Must-do before launch
 
@@ -60,6 +64,8 @@ Pass conditions:
   - `firewall-docs`: `PROJECT_HOME Docs CI`
 - Bot health check reports secure mode:
   - `security.mutationAuthMode` is `token` (not `unsafe-remote`).
+- Queue modal bot mutation checks pass in production mode with token-protected server
+  (`enable`, `disable`, `run`).
 - Rollback/escalation contacts confirmed.
 
 ## Launch decision rule

@@ -56,6 +56,9 @@ Cross-repo reference for delayed queue auto-execution.
 ## Operational notes
 - Run bot server in trusted environment.
 - Mutating API endpoints should be local-only or protected with `BOT_API_TOKEN`.
+- UI mutation requests can send token header when operator sets browser storage key:
+  - `sessionStorage.setItem('firewall.botApiToken', '<token>')`
+  - fallback: `localStorage.setItem('FIREWALL_BOT_API_TOKEN', '<token>')`
 - Keep relayer key only in secrets manager/env, never in repo files.
 - For internet-facing bot runtime, do not enable `BOT_ALLOW_UNSAFE_REMOTE`.
 
@@ -64,8 +67,12 @@ Cross-repo reference for delayed queue auto-execution.
 - Deploy bot from local machine:
   - `cd ../firewall-ui && npm run bot:deploy:remote`
 - Pre-deploy local checks are enforced by script default:
-  - `lint`, `security:static`, `test`, `smoke`, `integrity:check`.
+  - `lint`, `security:static`, `test`, `test:bot:e2e`, `smoke`, `integrity:check`.
 - Deploy flow now fails if health reports `mutationAuthMode=unsafe-remote` (unless explicitly overridden).
+
+Bot auth test coverage:
+- `firewall-ui/server/queue-bot-server.e2e.test.ts` validates startup/auth model
+  (`local-only`, `token`, `unsafe-remote`, token-header checks).
 
 Per-vault readiness preflight:
 - `cd ../firewall-wallet && BASE_RPC_URL=... VAULT_ADDRESS=0x... RELAYER_ADDRESS=0x... npm run bot:readiness:check`

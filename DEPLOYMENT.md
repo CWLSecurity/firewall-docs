@@ -21,6 +21,7 @@ Automatic release path from local operator machine:
    - `npm run security:static`
    - `npm run test:contracts`
    - `npm run smoke:contracts`
+   - launch e2e smoke includes `packages/contracts/test/smoke/V2EndToEndLaunchFlows.t.sol`
 2. On-chain deploy runs from this machine:
    - `npm run deploy:base`
    - script path: `../firewall-wallet/scripts/deploy-base-mainnet.sh`
@@ -42,11 +43,12 @@ Quality/security gates:
 - `npm run lint`
 - `npm run security:static`
 - `npm test`
+- `npm run test:bot:e2e`
 - `npm run smoke`
 - `npm run integrity:check`
 
 GitHub workflows:
-- `.github/workflows/ci.yml` (`lint`, `security:static`, `test`, `smoke`, `integrity:check`)
+- `.github/workflows/ci.yml` (`lint`, `security:static`, `test`, `test:bot:e2e`, `smoke`, `integrity:check`)
 - `.github/workflows/deploy-cloudflare-pages.yml` (build + Cloudflare Pages deploy on `main`)
 
 Required GitHub config:
@@ -68,12 +70,16 @@ Before remote deploy (automatic in script by default):
 - `npm run lint`
 - `npm run security:static`
 - `npm test`
+- `npm run test:bot:e2e`
 - `npm run smoke`
 - `npm run integrity:check`
 
 Bot API hardening requirements:
 - do not use `BOT_ALLOW_UNSAFE_REMOTE=true` in internet-facing runtime,
 - use `BOT_API_TOKEN` for remote mutation authorization,
+- for UI mutation calls, store operator token in browser storage:
+  - `sessionStorage.setItem('firewall.botApiToken', '<token>')`
+  - fallback key: `localStorage.setItem('FIREWALL_BOT_API_TOKEN', '<token>')`
 - bot deploy script fails if health reports `mutationAuthMode=unsafe-remote` (unless explicitly overridden).
 
 Remote deploy script:

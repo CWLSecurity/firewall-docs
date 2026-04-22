@@ -53,7 +53,7 @@ Execution status and open blockers are tracked in `LAUNCH_STATUS.md`.
 - Smoke pass complete on latest build.
 - CI status green for:
   - `PROJECT_HOME` docs/integrity workflow
-  - `firewall-ui` quality + security-static + smoke + integrity workflow
+  - `firewall-ui` quality + security-static + bot-e2e + smoke + integrity workflow
   - `firewall-wallet` contracts + security-static + smoke + integrity workflow
 - Integrity manifests checked:
   - `PROJECT_HOME/integrity/manifest.sha256`
@@ -62,4 +62,7 @@ Execution status and open blockers are tracked in `LAUNCH_STATUS.md`.
 - Incident/reporting path documented.
 - Rollback owner/escalation contacts defined.
 - Bot health returns secure auth mode (`security.mutationAuthMode` is not `unsafe-remote`).
+- Queue modal bot mutation auth path verified in production mode:
+  - browser token set (`firewall.botApiToken` or `FIREWALL_BOT_API_TOKEN`),
+  - enable/disable/run actions succeed against token-protected bot API.
 - Vault bot readiness preflight passed for launch vaults (`npm run bot:readiness:check`).
