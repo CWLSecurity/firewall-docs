@@ -33,6 +33,7 @@ Last updated: 2026-04-22
 - Transient RPC degradation handling verified (fallback copy + retry behavior).
 - No critical path depends on non-deterministic frontend-only policy logic.
 - Known limitations are explicitly documented in user-facing docs.
+- UI discovery lookback config reviewed for launch volume (`VITE_FACTORY_LOG_LOOKBACK_BLOCKS`, `VITE_QUEUE_LOG_LOOKBACK_BLOCKS`).
 
 ## 5) Privacy and Storage
 - Site-side business-state persistence disabled for wallet connection state.
@@ -58,3 +59,5 @@ Last updated: 2026-04-22
   - `firewall-wallet/integrity/manifest.sha256`
 - Incident/reporting path documented.
 - Rollback owner/escalation contacts defined.
+- Bot health returns secure auth mode (`security.mutationAuthMode` is not `unsafe-remote`).
+- Vault bot readiness preflight passed for launch vaults (`npm run bot:readiness:check`).

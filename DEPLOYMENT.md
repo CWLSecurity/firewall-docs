@@ -10,6 +10,7 @@ Canonical cross-repo deployment process for MVP.
 - Out of scope for MVP: `firewall-connector` deploy/release track.
 - MVP production rollout uses `firewall-wallet` + `firewall-ui`.
 - `firewall-connector` remains a post-MVP rollout track.
+- External audit is deferred until post-pilot stage.
 
 ## 1) Wallet (`firewall-wallet`)
 Target chain: Base Mainnet.
@@ -28,6 +29,8 @@ Automatic release path from local operator machine:
    - updates `../firewall-ui/src/contracts/addresses/base.ts`
    - refreshes `../firewall-ui/integrity/manifest.sha256`
 4. Then commit/push changed repos (`firewall-wallet`, `firewall-ui`) using their own release flow.
+5. For bot-enabled vaults, run readiness preflight:
+   - `BASE_RPC_URL=... VAULT_ADDRESS=0x... RELAYER_ADDRESS=0x... npm run bot:readiness:check`
 
 Address-sync script:
 - `../firewall-wallet/scripts/sync-ui-addresses-from-manifest.sh`
@@ -67,6 +70,11 @@ Before remote deploy (automatic in script by default):
 - `npm test`
 - `npm run smoke`
 - `npm run integrity:check`
+
+Bot API hardening requirements:
+- do not use `BOT_ALLOW_UNSAFE_REMOTE=true` in internet-facing runtime,
+- use `BOT_API_TOKEN` for remote mutation authorization,
+- bot deploy script fails if health reports `mutationAuthMode=unsafe-remote` (unless explicitly overridden).
 
 Remote deploy script:
 - `../firewall-ui/scripts/deploy-bot-remote.sh`

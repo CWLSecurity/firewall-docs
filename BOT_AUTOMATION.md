@@ -57,6 +57,7 @@ Cross-repo reference for delayed queue auto-execution.
 - Run bot server in trusted environment.
 - Mutating API endpoints should be local-only or protected with `BOT_API_TOKEN`.
 - Keep relayer key only in secrets manager/env, never in repo files.
+- For internet-facing bot runtime, do not enable `BOT_ALLOW_UNSAFE_REMOTE`.
 
 ## Deploy path (MVP)
 - Push bot-related code via `firewall-ui` repo flow.
@@ -64,3 +65,7 @@ Cross-repo reference for delayed queue auto-execution.
   - `cd ../firewall-ui && npm run bot:deploy:remote`
 - Pre-deploy local checks are enforced by script default:
   - `lint`, `security:static`, `test`, `smoke`, `integrity:check`.
+- Deploy flow now fails if health reports `mutationAuthMode=unsafe-remote` (unless explicitly overridden).
+
+Per-vault readiness preflight:
+- `cd ../firewall-wallet && BASE_RPC_URL=... VAULT_ADDRESS=0x... RELAYER_ADDRESS=0x... npm run bot:readiness:check`
