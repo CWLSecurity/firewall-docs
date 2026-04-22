@@ -25,6 +25,7 @@ jobs:
           test -f SECURITY_MODEL.md
           test -f SECURITY.md
           test -f LAUNCH_CHECKLIST.md
+          test -f LAUNCH_STATUS.md
           test -f SMOKE_TEST_PLAN.md
           test -f VERIFY_YOUR_FIREWALL.md
           test -f BOT_AUTOMATION.md
