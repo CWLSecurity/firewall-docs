@@ -11,6 +11,7 @@ RUN_PRECHECK=1
 RUN_QUALITY=1
 RUN_ONCHAIN=1
 RUN_DEPLOY=0
+RUN_LIVE_HEALTH=1
 
 usage() {
   cat <<'USAGE'
@@ -21,6 +22,7 @@ Options:
   --skip-quality     Skip quality gates.
   --skip-onchain     Skip on-chain verification.
   --deploy-ui        Run Cloudflare Pages UI deploy at the end.
+  --skip-live-health Skip public site and bot live-health checks.
   --help             Show this help.
 USAGE
 }
@@ -31,6 +33,7 @@ while [[ $# -gt 0 ]]; do
     --skip-quality) RUN_QUALITY=0 ;;
     --skip-onchain) RUN_ONCHAIN=0 ;;
     --deploy-ui) RUN_DEPLOY=1 ;;
+    --skip-live-health) RUN_LIVE_HEALTH=0 ;;
     --help)
       usage
       exit 0
@@ -48,6 +51,7 @@ status_preflight="SKIPPED"
 status_quality="SKIPPED"
 status_onchain="SKIPPED"
 status_deploy="SKIPPED"
+status_live_health="SKIPPED"
 
 run_step() {
   local name="$1"
@@ -80,6 +84,11 @@ if [[ "${RUN_DEPLOY}" == "1" ]]; then
   status_deploy="PASS"
 fi
 
+if [[ "${RUN_LIVE_HEALTH}" == "1" ]]; then
+  run_step "live health checks" "${ROOT_DIR}/scripts/ops-live-health-check.sh"
+  status_live_health="PASS"
+fi
+
 {
   echo "# Firewall Vault Release Report"
   echo
@@ -91,6 +100,7 @@ fi
   echo "| Quality gates | ${status_quality} |"
   echo "| On-chain verify | ${status_onchain} |"
   echo "| UI deploy | ${status_deploy} |"
+  echo "| Live health | ${status_live_health} |"
 } >"${REPORT_PATH}"
 
 echo "[release-runner] report: ${REPORT_PATH}"

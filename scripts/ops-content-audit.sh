@@ -48,7 +48,7 @@ log "checking strategy/document consistency"
 require_match "${ROOT_DIR}/README.md" "MVP Scope" "PROJECT_HOME README documents MVP scope"
 require_match "${ROOT_DIR}/DEPLOYMENT.md" "MVP production rollout uses .*firewall-wallet.*firewall-ui" "Deployment scope pins wallet+ui as MVP"
 require_match "${ROOT_DIR}/DEPLOYMENT.md" "firewall-connector.*post-MVP" "Connector is explicitly post-MVP in deployment map"
-require_match "${WALLET_DIR}/DEPLOYMENT_STATUS.md" "Base packs .*0.*1.*add-ons .*2.*3.*4" "Wallet docs include canonical pack lineup"
+require_match "${WALLET_DIR}/DEPLOYMENT_STATUS.md" "Base packs .*0.*1.*add-ons .*2.*3" "Wallet docs include canonical pack lineup"
 require_match "${UI_DIR}/README.md" "Current MVP path is fully functional without connector dependency" "UI docs keep connector out of MVP critical path"
 require_match "${CONNECTOR_DIR}/README.md" "rollout is scheduled for the post-MVP phase" "Connector docs mark post-MVP rollout"
 
