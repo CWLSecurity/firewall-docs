@@ -1,6 +1,6 @@
 # Firewall Vault Documentation Hub
 
-Last updated: 2026-04-22
+Last updated: 2026-04-28
 
 This folder is the cross-repo documentation hub for Firewall Vault.
 
@@ -20,9 +20,12 @@ Core runtime model:
   - Base `0`: Vault Safe
   - Base `1`: DeFi Trader
 - Additive protection packs currently surfaced:
-  - Add-on `2`: Approval Hardening
-  - Add-on `3`: 24-Hour New Receiver Delay
-  - Add-on `4`: 24-Hour Large Transfer Delay
+  - Add-on `2`: 24-Hour New Receiver Delay
+  - Add-on `3`: 24-Hour Large Transfer Delay
+- Current Base `0` (`Vault`) production line has two active base policies:
+  - `LargeTransferDelayPolicy`
+  - `NewReceiverDelayPolicy`
+- `InfiniteApprovalPolicy` exists in the contract codebase and deployment manifest, but it is not part of the current live Base `0` pack and there is no current live Approval Hardening add-on pack.
 - Delayed queue lifecycle in UI (review / execute / cancel).
 - Per-Vault queue bot automation with owner-controlled executor role.
 - Vault creation supports initial bot gas buffer funding.
@@ -67,6 +70,7 @@ Post-MVP:
 - `LAUNCH_CHECKLIST.md`
 - `LAUNCH_STATUS.md`
 - `SMOKE_TEST_PLAN.md`
+- `EXTERNAL_MANUAL_TEST_CASES.md`
 - `BOT_AUTOMATION.md`
 - `OPERATIONS_RUNBOOK.md`
 - `DEV_HANDOFF.md`

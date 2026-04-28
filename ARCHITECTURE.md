@@ -1,6 +1,6 @@
 # Firewall Vault — Architecture (Current)
 
-Last updated: 2026-03-25
+Last updated: 2026-04-28
 
 ## 1. System Overview
 
@@ -59,14 +59,15 @@ Base packs (fixed at create time):
 - Base `1`: DeFi Trader
 
 Add-on packs (enabled later, additive):
-- Add-on `2`: Approval Hardening
-- Add-on `3`: New Receiver 24h Delay
-- Add-on `4`: Large Transfer 24h Delay
+- Add-on `2`: New Receiver 24h Delay
+- Add-on `3`: Large Transfer 24h Delay
 
 Current semantics:
 - Enabled add-ons are snapshotted in router state.
 - Add-ons are additive only.
 - Current router line has no disable path for enabled add-ons.
+- Current deployed pack registry has four packs total: base packs `0`,`1` and add-ons `2`,`3`.
+- Approval hardening (`InfiniteApprovalPolicy`) is a code-level primitive, not an active live add-on in the current deployment line.
 
 ## 6. Product Surface Split
 - `firewall-wallet`: canonical contract semantics.

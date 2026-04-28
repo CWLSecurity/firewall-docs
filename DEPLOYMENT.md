@@ -102,6 +102,13 @@ Checks before push:
 
 Then push docs updates to GitHub.
 
+Live runtime check (post-deploy):
+- `cd ../PROJECT_HOME && ./scripts/ops-live-health-check.sh`
+- validates:
+  - `https://firewall-wallet.com` availability,
+  - `https://www.firewall-wallet.com` availability,
+  - bot health endpoint (`ok`, `runtime.hasBaseRpc`, `runtime.hasRelayerKey`, secure auth mode).
+
 ## Secrets policy
 - Tokens/keys stay in local machine environment or GitHub Secrets only.
 - `.env*`, private keys, token values must not be committed to git.

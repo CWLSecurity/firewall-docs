@@ -1,6 +1,6 @@
 # Verify Your Firewall (Current v2)
 
-Last updated: 2026-03-25
+Last updated: 2026-04-28
 
 This guide explains how to verify that your deployed/used Firewall Vault setup matches the intended architecture.
 
@@ -24,9 +24,12 @@ Factory auth expectation:
 In `PolicyPackRegistry`, confirm curated lineup:
 - Base `0` Conservative
 - Base `1` DeFi Trader
-- Add-on `2` Approval Hardening
-- Add-on `3` New Receiver 24h Delay
-- Add-on `4` Large Transfer 24h Delay
+- Add-on `2` New Receiver 24h Delay
+- Add-on `3` Large Transfer 24h Delay
+
+Expected current pack count:
+- `packCount() == 4`
+- `packIdAt(0..3) == 0,1,2,3`
 
 For each pack verify:
 - active status,
@@ -57,7 +60,7 @@ Large transfer policy must expose:
 ## 5. Verify critical behavior assumptions
 - Router decision order is `REVERT > DELAY > ALLOW`.
 - Scheduled execution path (`executeScheduled`) is still policy-rechecked and blocked if current decision is `Revert`.
-- Strict packs keep non-zero approval hard blocks.
+- Current live Base `0` does not include strict non-zero approval blocking. If a future strict/approval-hardening pack is deployed, verify `InfiniteApprovalPolicy` is present before relying on that behavior.
 - DeFi pack includes compensating controls for first risky spender/recipient patterns.
 - DeFi line delays first unknown-selector call:
   - to first-time EOAs,

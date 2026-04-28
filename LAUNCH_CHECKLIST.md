@@ -1,6 +1,6 @@
 # Firewall Vault — Launch Checklist (Current)
 
-Last updated: 2026-04-22
+Last updated: 2026-04-28
 
 Execution status and open blockers are tracked in `LAUNCH_STATUS.md`.
 
@@ -11,13 +11,15 @@ Execution status and open blockers are tracked in `LAUNCH_STATUS.md`.
 - Confirm deployed addresses and explorer verification are published.
 - Confirm curated packs are registered and active:
   - Base `0` / Base `1`
-  - Add-ons `2`, `3`, `4`
+  - Add-ons `2`, `3`
 - Confirm policy metadata introspection values (`policyKey`, `policyName`, `policyConfigVersion`, config entries) for all active pack policies.
 
 ## 2) Security Semantics Validation
 - Router decision priority validated on live deployment (`REVERT > DELAY > ALLOW`).
 - `executeScheduled` current-policy recheck validated.
-- Strict approval behavior validated on conservative line.
+- Current approval behavior validated honestly:
+  - Base `0` has no strict approval policy in the current live deployment.
+  - Base `1` DeFi approval guardrails and first-spender controls are validated.
 - DeFi line compensating controls validated (new spender/new recipient friction paths).
 - Large-transfer threshold boundaries validated (`below`, `equal`, `above`).
 

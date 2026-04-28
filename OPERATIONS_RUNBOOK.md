@@ -57,6 +57,18 @@ Expected pass conditions:
   - `runtime.hasRelayerKey: true`
   - `security.mutationAuthMode` should be `token` (or `local-only` for localhost-only mode)
 
+Automated check command:
+```bash
+cd ../PROJECT_HOME
+./scripts/ops-live-health-check.sh
+```
+
+Release runner includes live checks by default:
+```bash
+cd ../PROJECT_HOME
+./scripts/ops-release-runner.sh
+```
+
 ## 6) Incident procedure (minimal)
 1. Contain:
    - disable bot per affected vault from UI, or revoke executor on-chain.

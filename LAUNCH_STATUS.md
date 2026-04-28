@@ -1,46 +1,52 @@
 # Firewall Vault — Launch Status (Pilot Go-Live)
 
-Last updated: 2026-04-22
+Last updated: 2026-04-28
 
 ## Current state
 - `firewall-ui`: deployed to Cloudflare Pages (`firewall-wallet.com`, `www.firewall-wallet.com`).
 - Bot runtime: deployed on VPS and reachable via `bot.firewall-wallet.com`.
-- Deployment model: documented and aligned across repos (`wallet` local deploy, `ui` GitHub->Pages, `bot` local->VPS).
+- Deployment model: documented across repos (`wallet` local deploy, `ui` GitHub->Pages, `bot` local->VPS).
+- Current live/deploy pack truth:
+  - Base `0`: Vault / Conservative
+  - Base `1`: DeFi Trader
+  - Add-on `2`: 24-Hour New Receiver Delay
+  - Add-on `3`: 24-Hour Large Transfer Delay
+- Current live Base `0` has two active base policies: `LargeTransferDelayPolicy` and `NewReceiverDelayPolicy`.
+- `InfiniteApprovalPolicy` is deployed and present in code, but it is not active in current live Base `0` and there is no live Approval Hardening add-on pack.
+- Launch policy decision: launch the current simplified 4-pack line (`Vault` with 2 default policies, `DeFi Trader`, plus add-ons `2` and `3`). No policy redeploy is planned for this launch.
 - Handoff docs for dev team: added in all repos.
-- Bot auth hardening update shipped:
+- Bot auth hardening exists in current `firewall-ui` code:
   - UI supports token header for bot mutation endpoints via browser storage keys,
   - bot auth model has dedicated e2e tests in `firewall-ui` CI (`test:bot:e2e`).
+- Live bot runtime check currently fails the production auth gate because health does not expose `security.mutationAuthMode`.
 - Wallet smoke coverage expanded with launch e2e flow scenarios (`V2EndToEndLaunchFlows.t.sol`).
 
 ## Must-do before launch
 
-### P0 blocker: switch conservative large-transfer threshold from test mode to production
-Current state (test mode):
-- conservative threshold defaults to `0` in deploy scripts:
-  - `../firewall-wallet/packages/contracts/script/DeployBaseMainnet.s.sol`
-  - `../firewall-wallet/packages/contracts/script/DeployFactoryBaseMainnet.s.sol`
+### P0 policy decision: launch current 4-pack line
+Decision:
+- live registry and manifest are aligned on 4 packs (`0,1,2,3`);
+- launch scope is the current simplified model: `Vault` Base `0`, `DeFi Trader` Base `1`, add-on `2`, add-on `3`;
+- conservative large-transfer thresholds are no longer `0` in the current manifest;
+- current live Base `0` does not include strict approval hardening;
+- no policy redeploy is planned for this launch.
 
-Production target:
-- `LARGE_TRANSFER_THRESHOLD_WEI = 50000000000000000` (`0.05 ETH`)
-- `LARGE_TRANSFER_ERC20_THRESHOLD_UNITS = 50000000000000000` (raw units baseline)
+I should not redeploy policies without a new explicit approval.
 
-Required actions:
-1. Run wallet release with production threshold envs.
-2. Redeploy contracts on Base (`npm run deploy:base`).
-3. Auto-sync addresses into `firewall-ui`.
-4. Re-run wallet and ui quality gates.
-5. Verify on-chain config/metadata and publish final addresses.
-
-Done criteria:
-- no conservative pack with threshold `0` in active production deployment,
-- deployment artifacts reflect production threshold,
-- UI policy surfaces are consistent with on-chain values.
+If a stricter line is required after launch, the implementation path is:
+1. Change deploy scripts and smoke/fork fixtures to one canonical pack lineup.
+2. Run wallet contract tests and smoke tests.
+3. Dry-run Base deployment.
+4. Broadcast only after explicit approval.
+5. Sync UI addresses from the new manifest.
+6. Re-run UI/build/integrity and on-chain verification.
 
 ### P1: final live security semantics check
 - Validate live behavior for:
   - `REVERT > DELAY > ALLOW`,
   - `executeScheduled` re-checks current policy,
   - large-transfer boundaries: below/equal/above threshold.
+- Validate current approval behavior without overclaiming strict Base `0` approval protection.
 
 ### P1: bot readiness for each launch vault
 Run for each launch vault:
@@ -63,7 +69,8 @@ Pass conditions:
   - `firewall-ui`: `Firewall UI CI`, `Firewall UI Deploy (Cloudflare Pages)`
   - `firewall-docs`: `PROJECT_HOME Docs CI`
 - Bot health check reports secure mode:
-  - `security.mutationAuthMode` is `token` (not `unsafe-remote`).
+  - `security.mutationAuthMode` is present,
+  - expected production value is `token` (not `unsafe-remote` and not missing).
 - Queue modal bot mutation checks pass in production mode with token-protected server
   (`enable`, `disable`, `run`).
 - Rollback/escalation contacts confirmed.
