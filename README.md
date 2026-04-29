@@ -17,7 +17,7 @@ Core runtime model:
 ## What Is Live Now
 - Vault creation/import flows in UI.
 - Two base protection lines:
-  - Base `0`: Vault Safe
+  - Base `0`: Vault
   - Base `1`: DeFi Trader
 - Additive protection packs currently surfaced:
   - Add-on `2`: 24-Hour New Receiver Delay
