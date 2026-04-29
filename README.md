@@ -83,6 +83,9 @@ Post-MVP:
 - `firewall-ui`: `npm run lint`, `npm run security:static`, `npm test`, `npm run test:bot:e2e`, `npm run smoke`, `npm run integrity:check`
 - `firewall-wallet`: `npm run security:static`, `npm run test:contracts`, `npm run smoke:contracts`, `npm run integrity:check`
 
+## Automation Status
+As of 2026-04-29, automated code/docs/CI/integrity checks are complete and green for the current launch line. Remaining launch gates are manual live checks, bot readiness checks against real vaults, and ops sign-off.
+
 ## Messaging Guardrails (Short)
 Safe claims:
 - "On-chain transaction firewall for Base."
