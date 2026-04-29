@@ -1,6 +1,6 @@
 # Firewall Vault Documentation Hub
 
-Last updated: 2026-04-28
+Last updated: 2026-04-29
 
 This folder is the cross-repo documentation hub for Firewall Vault.
 
@@ -25,7 +25,7 @@ Core runtime model:
 - Current Base `0` (`Vault`) production line has two active base policies:
   - `LargeTransferDelayPolicy`
   - `NewReceiverDelayPolicy`
-- `InfiniteApprovalPolicy` exists in the contract codebase and deployment manifest, but it is not part of the current live Base `0` pack and there is no current live Approval Hardening add-on pack.
+- `InfiniteApprovalPolicy` exists in the contract codebase and deployment manifest, but it is not part of the current live Base `0` pack. There is no active Approval Hardening add-on pack in the current live line.
 - Delayed queue lifecycle in UI (review / execute / cancel).
 - Per-Vault queue bot automation with owner-controlled executor role.
 - Vault creation supports initial bot gas buffer funding.
