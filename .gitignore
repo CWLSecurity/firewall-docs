@@ -1,6 +1,9 @@
 .ops/
 .env
 .env.*
+scripts/
+integrity/
+.github/
 BOT_AUTOMATION.md
 DEV_HANDOFF.md
 EXTERNAL_MANUAL_TEST_CASES.md

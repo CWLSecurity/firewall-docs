@@ -61,30 +61,11 @@ Post-MVP:
 - `../firewall-connector`
   - EIP-1193 vault-visible connector boundary
 
-## Core Docs In This Folder
-- `ARCHITECTURE.md`
-- `DEPLOYMENT.md`
+## Docs In This Folder
+- `README.md`
 - `SECURITY.md`
-- `SECURITY_MODEL.md`
-- `VERIFY_YOUR_FIREWALL.md`
-- `LAUNCH_CHECKLIST.md`
-- `LAUNCH_STATUS.md`
-- `SMOKE_TEST_PLAN.md`
-- `EXTERNAL_MANUAL_TEST_CASES.md`
-- `BOT_AUTOMATION.md`
-- `OPERATIONS_RUNBOOK.md`
-- `DEV_HANDOFF.md`
 - `TERMS_OF_USE.md`
 - `PRIVACY_NOTICE.md`
-- `MARKETING_BRIEF.md`
-
-## CI / Smoke / Integrity
-- `PROJECT_HOME`: docs integrity check via `./scripts/integrity.sh check`
-- `firewall-ui`: `npm run lint`, `npm run security:static`, `npm test`, `npm run test:bot:e2e`, `npm run smoke`, `npm run integrity:check`
-- `firewall-wallet`: `npm run security:static`, `npm run test:contracts`, `npm run smoke:contracts`, `npm run integrity:check`
-
-## Automation Status
-As of 2026-04-29, automated code/docs/CI/integrity checks are complete and green for the current launch line. Remaining launch gates are manual live checks, bot readiness checks against real vaults, and ops sign-off.
 
 ## Messaging Guardrails (Short)
 Safe claims:

@@ -54,7 +54,3 @@ It does not remove all risk. Users must still secure:
 - devices/browser,
 - frontend access path,
 - deployment verification assumptions.
-
-## Canonical references
-- `SECURITY_MODEL.md`
-- `VERIFY_YOUR_FIREWALL.md`
